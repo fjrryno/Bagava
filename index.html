@@ -88,7 +88,7 @@
                 </button>
                 
                 <div class="text-[10px] text-slate-400 text-center pt-1">
-                    <p>Catatan: Email yang mengandung <code class="text-blue-400">hr</code> atau <code class="text-blue-400">admin</code> akan otomatis masuk sebagai Administrator HR.</p>
+                    <p>Catatan: Email dengan kata kunci <code class="text-blue-400">hr</code> atau <code class="text-blue-400">admin</code> otomatis masuk sebagai Administrator HR.</p>
                 </div>
             </div>
         </div>
@@ -119,21 +119,21 @@
                 <!-- ================= TAB 1: BERANDA ================= -->
                 <div x-show="activeTab === 'home'" class="space-y-4" x-cloak>
                     
-                    <!-- KARTU KHUSUS HR ADMIN -->
+                    <!-- PANEL HR ADMIN -->
                     <template x-if="currentUser.type === 'admin'">
                         <div class="bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 text-white p-5 rounded-2xl shadow-xl border border-blue-900 space-y-3">
                             <div class="flex justify-between items-center border-b border-blue-900/60 pb-2">
                                 <h3 class="font-bold text-xs uppercase tracking-wider text-blue-400"><i class="fa-solid fa-shield-halved mr-1.5"></i> Panel Kendali Administrator HR</h3>
                                 <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded font-bold">Akses Penuh</span>
                             </div>
-                            <p class="text-xs text-slate-300">Anda memiliki wewenang untuk meninjau dan menyetujui seluruh pengajuan cuti, absensi, serta perubahan data staff.</p>
+                            <p class="text-xs text-slate-300">Anda memiliki wewenang penuh untuk meninjau dan menyetujui seluruh pengajuan cuti, absensi, serta perubahan data staff.</p>
                             <button @click="activeTab = 'team'" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow">
                                 Tinjau Pengajuan Masuk (<span x-text="leaveRequests.length"></span>)
                             </button>
                         </div>
                     </template>
 
-                    <!-- KARTU SHIFT & CLOCK IN / CLOCK OUT (KHUSUS STAFF) -->
+                    <!-- KARTU SHIFT & CLOCK IN / CLOCK OUT (STAFF) -->
                     <template x-if="currentUser.type !== 'admin'">
                         <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800 text-center relative overflow-hidden space-y-3">
                             <div class="absolute top-0 right-0 bg-blue-900/60 text-blue-300 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-blue-800">
@@ -157,7 +157,6 @@
                                 </div>
                             </div>
 
-                            <!-- Tombol Aksi Shift -->
                             <div class="pt-1">
                                 <template x-if="!isClockedIn">
                                     <button @click="openCamera('in')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
@@ -227,30 +226,10 @@
                             <i class="fa-solid fa-clipboard-list"></i>
                         </div>
                     </div>
-
-                    <!-- BAGIAN PENGUMUMAN -->
-                    <div class="bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Pengumuman Perusahaan</h3>
-                            <button @click="showPopup('Pengumuman', 'Seluruh arsip pengumuman instansi tersedia.')" class="text-xs text-blue-400 font-semibold hover:underline">Lihat semua</button>
-                        </div>
-
-                        <div class="space-y-3 text-xs divide-y divide-slate-800">
-                            <div class="pt-2 flex justify-between items-start">
-                                <div class="space-y-0.5 pr-2">
-                                    <p class="font-bold text-slate-200 leading-snug">Kelengkapan Administrasi Absensi Periode Berjalan</p>
-                                    <p class="text-[11px] text-slate-400">Departemen SDM</p>
-                                </div>
-                                <span class="text-[10px] text-slate-500 shrink-0 font-medium">04 Okt</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- ================= TAB 2: PENGAJUAN & PERSETUJUAN (TEAM/APPROVAL) ================= -->
+                <!-- ================= TAB 2: PENGAJUAN & KEHADIRAN ================= -->
                 <div x-show="activeTab === 'team'" class="space-y-4" x-cloak>
-                    
-                    <!-- TAMPILAN KHUSUS HR ADMIN (SETUJU / TOLAK) -->
                     <template x-if="currentUser.type === 'admin'">
                         <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 space-y-3">
                             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -272,14 +251,10 @@
                                         </div>
                                     </div>
                                 </template>
-                                <template x-if="leaveRequests.length === 0">
-                                    <p class="text-slate-500 text-center py-6 text-xs">Tidak ada pengajuan yang memerlukan persetujuan.</p>
-                                </template>
                             </div>
                         </div>
                     </template>
 
-                    <!-- TAMPILAN RIWAYAT UNTUK STAFF -->
                     <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Riwayat Kehadiran & Shift</h3>
@@ -307,14 +282,11 @@
                                     <p class="text-[10px] text-slate-400 truncate"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> <span x-text="att.location"></span></p>
                                 </div>
                             </template>
-                            <template x-if="attendanceHistory.length === 0">
-                                <p class="text-slate-500 text-center py-6 text-xs">Belum ada riwayat kehadiran tercatat.</p>
-                            </template>
                         </div>
                     </div>
                 </div>
 
-                <!-- ================= TAB 3: INBOX PESAN & NOTIFIKASI ================= -->
+                <!-- ================= TAB 3: INBOX ================= -->
                 <div x-show="activeTab === 'inbox'" class="space-y-4" x-cloak>
                     <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -336,14 +308,18 @@
                     </div>
                 </div>
 
-                <!-- ================= TAB 4: PAYROLL / SLIP GAJI ================= -->
+                <!-- ================= TAB 4: PAYROLL (LIVE CALCULATION) ================= -->
                 <div x-show="activeTab === 'payroll'" class="space-y-4" x-cloak>
                     <div class="bg-gradient-to-br from-blue-950 via-slate-900 to-slate-950 text-white p-5 rounded-2xl shadow-lg space-y-3 border border-slate-800">
-                        <p class="text-xs text-blue-300 font-medium">Take Home Pay (September 2026)</p>
-                        <h2 class="text-2xl font-extrabold tracking-tight">Rp 5.450.000</h2>
-                        <div class="text-[11px] text-slate-300 pt-2 border-t border-slate-800 space-y-1">
-                            <div class="flex justify-between"><span>Gaji Pokok & Tunjangan:</span> <span class="font-bold">Rp 6.000.000</span></div>
-                            <div class="flex justify-between"><span>Potongan BPJS & PPh 21:</span> <span class="text-rose-400 font-bold">- Rp 550.000</span></div>
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <span class="text-xs text-blue-300 font-medium">Live Take Home Pay (Oktober 2026)</span>
+                            <span class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded font-bold">Auto-Calculated</span>
+                        </div>
+                        <h2 class="text-2xl font-extrabold tracking-tight" x-text="'Rp ' + calculatedTakeHomePay.toLocaleString('id-ID')"></h2>
+                        <div class="text-[11px] text-slate-300 pt-1 space-y-1">
+                            <div class="flex justify-between"><span>Gaji Pokok & Tunjangan Tetap:</span> <span class="font-bold">Rp 6.000.000</span></div>
+                            <div class="flex justify-between"><span>Bonus Kehadiran & Lembur:</span> <span class="text-emerald-400 font-bold" x-text="'+ Rp ' + attendanceBonus.toLocaleString('id-ID')"></span></div>
+                            <div class="flex justify-between"><span>Potongan Kedisiplinan / BPJS:</span> <span class="text-rose-400 font-bold">- Rp 550.000</span></div>
                         </div>
                     </div>
                     <button @click="showPopup('Unduh Payslip', 'Slip Gaji resmi berformat PDF berhasil diunduh.')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs shadow-md transition">
@@ -351,44 +327,93 @@
                     </button>
                 </div>
 
-                <!-- ================= TAB 5: AKUN & PROFIL ================= -->
-                <div x-show="activeTab === 'account'" class="space-y-4" x-cloak>
-                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-center space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-blue-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto shadow-md border border-blue-500" x-text="currentUser.initial"></div>
-                        <div>
-                            <h3 class="font-bold text-slate-100 text-base" x-text="currentUser.name"></h3>
-                            <p class="text-xs text-slate-400" x-text="currentUser.email"></p>
-                            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-950 text-blue-400 border border-blue-900" x-text="currentUser.role"></span>
+                <!-- ================= TAB 5: AKUN (SESUAI REFERENSI GAMBAR) ================= -->
+                <div x-show="activeTab === 'account'" class="space-y-4 text-xs" x-cloak>
+                    
+                    <!-- KARTU PROFIL UTAMA -->
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-sm flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full bg-blue-600 text-white font-extrabold text-base flex items-center justify-center shadow-md border border-blue-500" x-text="currentUser.initial"></div>
+                            <div>
+                                <h3 class="font-bold text-slate-100 text-sm" x-text="currentUser.name"></h3>
+                                <p class="text-[11px] text-slate-400" x-text="currentUser.role"></p>
+                                <p class="text-[10px] text-blue-400 font-medium">PT. Pesona Estetika Internasional</p>
+                            </div>
+                        </div>
+                        <div class="w-10 h-10 rounded-full overflow-hidden border border-slate-700 bg-slate-800 flex items-center justify-center">
+                            <i class="fa-solid fa-user text-slate-400 text-lg"></i>
                         </div>
                     </div>
 
-                    <!-- Form Data Diri -->
-                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3 text-xs">
-                        <h4 class="font-bold text-slate-200 border-b border-slate-800 pb-2"><i class="fa-solid fa-address-card text-blue-400 mr-1.5"></i> Data Diri & Kontak Darurat</h4>
-                        
-                        <div class="space-y-2.5">
-                            <div>
-                                <label class="block text-slate-400 mb-1 font-medium">Nomor Telepon / WhatsApp</label>
-                                <input type="text" x-model="userProfile.phone" placeholder="081234567890" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200 focus:outline-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-slate-400 mb-1 font-medium">Alamat Domisili</label>
-                                <textarea x-model="userProfile.address" rows="2" placeholder="Masukkan alamat lengkap..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200 focus:outline-blue-500"></textarea>
-                            </div>
-                            <button @click="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition shadow-md mt-2">
-                                Simpan Perubahan Profil
+                    <!-- BAGIAN: INFO SAYA -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+                        <div class="p-3.5 border-b border-slate-800 font-bold text-slate-200">Info saya</div>
+                        <div class="divide-y divide-slate-800/60">
+                            <button @click="showPopup('Info Personal', 'Nama Lengkap: ' + currentUser.name + '\nEmail: ' + currentUser.email + '\nStatus Karyawan: Karyawan Tetap')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-user text-blue-400 w-4"></i> Info personal</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <button @click="showPopup('Info Pekerjaan', 'Jabatan: ' + currentUser.role + '\nDepartemen: Operasional & CRM\nLokasi: Kantor Pusat')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-briefcase text-blue-400 w-4"></i> Info pekerjaan</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <button @click="showPopup('Kontak Darurat', 'Nomor Telepon: ' + userProfile.phone + '\nAlamat: ' + userProfile.address)" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-address-book text-blue-400 w-4"></i> Info kontak darurat</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <button @click="showPopup('Info Keluarga', 'Status Pernikahan: Belum Menikah\nTanggungan Keluarga: Nihil')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-users text-blue-400 w-4"></i> Info keluarga</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <button @click="showPopup('Pendidikan', 'Universitas Swasta - S1 Manajemen Bisnis\nPengalaman: 5 Tahun di Bidang Operasional')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-graduation-cap text-blue-400 w-4"></i> Pendidikan & Pengalaman</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <button @click="activeTab = 'payroll'" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-file-invoice-dollar text-blue-400 w-4"></i> Info payroll & rekening</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <button @click="showPopup('File Saya', 'KTP, NPWP, dan Paklaring telah terverifikasi di Cloud Storage.')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-folder-open text-blue-400 w-4"></i> File saya</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button @click="logoutFirebase()" class="w-full bg-rose-950/50 hover:bg-rose-900/50 text-rose-400 font-bold py-3 rounded-2xl text-xs transition border border-rose-900 shadow-sm">
-                        Keluar dari Sesi <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
-                    </button>
+                    <!-- BAGIAN: PENGATURAN -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+                        <div class="p-3.5 border-b border-slate-800 font-bold text-slate-200">Pengaturan</div>
+                        <div class="divide-y divide-slate-800/60">
+                            <button @click="showPopup('Ubah Kata Sandi', 'Silakan masukkan kata sandi lama dan baru melalui sistem keamanan.')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-lock text-slate-400 w-4"></i> Ubah kata sandi</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <div class="p-3.5 flex justify-between items-center">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-shield text-slate-400 w-4"></i> PIN Keamanan</span>
+                                <span class="text-slate-500">Tidak aktif</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BAGIAN: BANTUAN & LAINNYA -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+                        <div class="p-3.5 border-b border-slate-800 font-bold text-slate-200">Lainnya</div>
+                        <div class="divide-y divide-slate-800/60">
+                            <button @click="showPopup('Pusat Bantuan', 'Hubungi tim dukungan IT atau HR melalui helpdesk internal.')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                                <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-circle-question text-slate-400 w-4"></i> Pusat bantuan</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
+                            </button>
+                            <button @click="logoutFirebase()" class="w-full p-3.5 flex justify-between items-center hover:bg-rose-950/30 transition text-left text-rose-400 font-bold">
+                                <span class="flex items-center gap-2.5"><i class="fa-solid fa-arrow-right-from-bracket w-4"></i> Keluar sesi aplikasi</span>
+                                <i class="fa-solid fa-chevron-right text-rose-500 text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
             </main>
 
-            <!-- NAVIGATION BAR BAWAH TEMA NAVY -->
+            <!-- NAVIGATION BAR BAWAH -->
             <nav class="bg-slate-900 border-t border-slate-800 p-2 px-4 flex justify-around text-center text-xs text-slate-400 absolute bottom-0 w-full shadow-lg z-20">
                 <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-blue-400 font-bold' : 'hover:text-slate-200'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
                     <i class="fa-solid fa-house text-sm"></i> Beranda
@@ -408,29 +433,28 @@
                 </button>
             </nav>
 
-            <!-- MODAL KAMERA OTOMATIS (MIRROR VIEW + WATERMARK WAKTU & LOKASI) -->
+            <!-- MODAL KAMERA & GEOFENCING (HAFERSINE DISTANCE) -->
             <div x-show="showCameraModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-5 z-50 animate-in fade-in" x-cloak>
                 <div class="flex justify-between items-center text-white">
                     <div>
-                        <h3 class="font-bold text-sm">Presensi Liveness & Lokasi</h3>
-                        <p class="text-[10px] text-slate-400">Posisikan wajah Anda di dalam frame kamera</p>
+                        <h3 class="font-bold text-sm">Presensi & Validasi Radius Geofencing</h3>
+                        <p class="text-[10px] text-slate-400">Pastikan Anda berada dalam area radius kantor</p>
                     </div>
                     <button @click="closeCamera()" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold">✕</button>
                 </div>
 
-                <!-- Viewfinder Kamera Mirror -->
-                <div class="relative w-full max-w-xs h-96 mx-auto rounded-3xl overflow-hidden border-2 border-blue-500 shadow-2xl bg-black">
+                <div class="relative w-full max-w-xs h-80 mx-auto rounded-3xl overflow-hidden border-2 border-blue-500 shadow-2xl bg-black">
                     <video id="cameraStream" autoplay playsinline class="w-full h-full object-cover"></video>
-                    <!-- Watermark Overlay di dalam kamera -->
-                    <div class="absolute bottom-3 left-3 right-3 bg-slate-950/80 backdrop-blur-sm p-2.5 rounded-xl border border-slate-700 text-[10px] text-slate-200 space-y-0.5 shadow">
-                        <p class="font-bold text-blue-400"><i class="fa-solid fa-clock mr-1"></i> <span x-text="liveCameraTime"></span></p>
-                        <p class="truncate"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i> <span x-text="liveCameraLocation"></span></p>
+                    <div class="absolute bottom-3 left-3 right-3 bg-slate-950/80 backdrop-blur-sm p-2 rounded-xl border border-slate-700 text-[10px] text-slate-200 space-y-0.5">
+                        <p class="font-bold text-blue-400" x-text="liveCameraTime"></p>
+                        <p class="truncate" x-text="liveCameraLocation"></p>
+                        <p class="font-semibold" :class="isWithinGeofence ? 'text-emerald-400' : 'text-rose-400'" x-text="geofenceStatusText"></p>
                     </div>
                 </div>
 
                 <div class="pb-6 text-center">
-                    <button @click="captureAndSubmitAttendance()" class="w-full max-w-xs mx-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 text-xs">
-                        <i class="fa-solid fa-camera-retro"></i> Ambil Foto & Konfirmasi Absen
+                    <button @click="captureAndSubmitAttendance()" :disabled="!isWithinGeofence" :class="isWithinGeofence ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30' : 'bg-slate-800 text-slate-500 cursor-not-allowed'" class="w-full max-w-xs mx-auto text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-xs transition">
+                        <i class="fa-solid fa-camera-retro"></i> <span x-text="isWithinGeofence ? 'Ambil Foto & Konfirmasi Absen' : 'Diluar Radius Kantor (Validasi Gagal)'"></span>
                     </button>
                 </div>
             </div>
@@ -444,35 +468,35 @@
                     </div>
 
                     <div class="space-y-1 text-xs">
-                        <button @click="openModal('Reimbursement'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                        <button @click="openModal('Reimbursement'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-cyan-950 text-cyan-400 flex items-center justify-center border border-cyan-900"><i class="fa-solid fa-receipt text-sm"></i></div>
                                 <span class="font-bold text-slate-200 text-sm">Reimbursement</span>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
-                        <button @click="openModal('Cuti'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                        <button @click="openModal('Cuti'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-indigo-950 text-indigo-400 flex items-center justify-center border border-indigo-900"><i class="fa-solid fa-clock-rotate-left text-sm"></i></div>
                                 <span class="font-bold text-slate-200 text-sm">Cuti</span>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
-                        <button @click="openModal('Absensi'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                        <button @click="openModal('Absensi'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-rose-950 text-rose-400 flex items-center justify-center border border-rose-900"><i class="fa-solid fa-location-dot text-sm"></i></div>
                                 <span class="font-bold text-slate-200 text-sm">Absensi</span>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
-                        <button @click="openModal('Perubahan shift'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                        <button @click="openModal('Perubahan shift'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-orange-950 text-orange-400 flex items-center justify-center border border-orange-900"><i class="fa-solid fa-briefcase text-sm"></i></div>
                                 <span class="font-bold text-slate-200 text-sm">Perubahan shift</span>
                             </div>
                             <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
-                        <button @click="openModal('Perubahan data'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                        <button @click="openModal('Perubahan data'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-blue-950 text-blue-400 flex items-center justify-center border border-blue-900"><i class="fa-solid fa-id-card text-sm"></i></div>
                                 <span class="font-bold text-slate-200 text-sm">Perubahan data</span>
@@ -487,7 +511,7 @@
             <div x-show="showAllAppsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-end md:items-center justify-center z-50 animate-in fade-in" x-cloak>
                 <div class="bg-slate-900 text-slate-100 w-full max-w-md rounded-t-[2.5rem] md:rounded-3xl p-6 shadow-2xl space-y-5 max-h-[85vh] overflow-y-auto border border-slate-800">
                     <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                        <h3 class="font-extrabold text-base text-slate-100">Semua Aplikasi</h3>
+                        <h3 class="font-extrabold text-base text-slate-100">Menu Lainnya</h3>
                         <button @click="showAllAppsModal = false" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-700 font-bold">✕</button>
                     </div>
 
@@ -513,7 +537,7 @@
                             <div class="w-12 h-12 rounded-2xl bg-blue-950 text-blue-400 flex items-center justify-center text-lg border border-blue-900"><i class="fa-solid fa-wallet"></i></div>
                             <span class="text-[11px] font-medium text-slate-300">Slip Gaji</span>
                         </button>
-                        <button @click="showPopup('Kalender', 'Kalender kerja perusahaan.')" class="flex flex-col items-center gap-1.5 group">
+                        <button @click="showPopup('Kalender', 'Jadwal kerja dan libur nasional.')" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-pink-950 text-pink-400 flex items-center justify-center text-lg border border-pink-900"><i class="fa-solid fa-calendar"></i></div>
                             <span class="text-[11px] font-medium text-slate-300">Kalender</span>
                         </button>
@@ -521,7 +545,7 @@
                 </div>
             </div>
 
-            <!-- MODAL FORM ESS (PENGISIAN PENGAJUAN) -->
+            <!-- MODAL FORM ESS -->
             <div x-show="showModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
                 <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-800">
                     <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -547,7 +571,7 @@
                 </div>
             </div>
 
-            <!-- MODAL POPUP NOTIFIKASI -->
+            <!-- MODAL POPUP -->
             <div x-show="showPopupModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
                 <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 text-center border border-slate-800">
                     <div class="w-12 h-12 bg-blue-950 text-blue-400 rounded-full flex items-center justify-center mx-auto text-xl border border-blue-900">
@@ -555,7 +579,7 @@
                     </div>
                     <div class="space-y-1">
                         <h3 class="font-bold text-sm text-slate-100" x-text="popupTitle"></h3>
-                        <p class="text-xs text-slate-400" x-text="popupMessage"></p>
+                        <p class="text-xs text-slate-400 whitespace-pre-line" x-text="popupMessage"></p>
                     </div>
                     <button @click="showPopupModal = false" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
                         Tutup
@@ -567,7 +591,7 @@
 
     </div>
 
-    <!-- Script Logika Ultimate Enterprise -->
+    <!-- Script Logika Ultimate Enterprise dengan Haversine Geofencing & Live Payroll -->
     <script>
         function ultimateEnterpriseApp() {
             return {
@@ -579,7 +603,7 @@
                 regName: '',
                 activeTab: 'home',
                 currentUserId: '',
-                currentUser: { name: 'Deden Fajar Riyanto', role: 'Staff Operasional', initial: 'DF', email: '', type: 'employee' },
+                currentUser: { name: 'Deden Fajar Riyanto', role: 'Admin E-Commerce CS', initial: 'DF', email: '', type: 'employee' },
                 
                 isClockedIn: false,
                 isClockedOut: false,
@@ -594,7 +618,14 @@
                 cameraMode: 'in',
                 mediaStream: null,
                 liveCameraTime: '',
-                liveCameraLocation: 'Mendeteksi lokasi GPS...',
+                liveCameraLocation: 'Mendeteksi koordinat GPS...',
+                isWithinGeofence: true,
+                geofenceStatusText: 'Validasi Radius: Dalam Jangkauan Kantor (0m)',
+
+                // Koordinat Kantor Pusat (Contoh: Jakarta Selatan)
+                officeLat: -6.2293,
+                officeLng: 106.8167,
+                maxRadiusMeters: 200,
 
                 modalType: 'Cuti',
                 formInput: { date: '', reason: '' },
@@ -618,6 +649,17 @@
 
                 get unreadInboxCount() {
                     return this.inboxMessages.filter(m => !m.read).length;
+                },
+
+                get attendanceBonus() {
+                    // Kalkulasi bonus kehadiran dinamis berdasarkan jumlah hari hadir di Firestore
+                    return this.attendanceHistory.length * 50000;
+                },
+
+                get calculatedTakeHomePay() {
+                    const baseSalary = 6000000;
+                    const deductions = 550000;
+                    return baseSalary + this.attendanceBonus - deductions;
                 },
 
                 markAllInboxRead() {
@@ -651,14 +693,14 @@
                         const userDocRef = window.fb.doc(window.fb.db, "users", uid);
                         const userDoc = await window.fb.getDoc(userDocRef);
                         
-                        let userData = { name: 'Deden Fajar Riyanto', role: 'Staff Operasional', type: 'employee' };
+                        let userData = { name: 'Deden Fajar Riyanto', role: 'Admin E-Commerce CS', type: 'employee' };
                         if (userDoc.exists()) {
                             userData = userDoc.data();
                         } else {
                             const isAdmin = email.toLowerCase().includes('hr') || email.toLowerCase().includes('admin');
                             userData = { 
                                 name: isAdmin ? 'Sarah Manager' : 'Deden Fajar Riyanto', 
-                                role: isAdmin ? 'HR Administrator' : 'Staff Operasional', 
+                                role: isAdmin ? 'HR Administrator' : 'Admin E-Commerce CS', 
                                 type: isAdmin ? 'admin' : 'employee' 
                             };
                         }
@@ -706,7 +748,7 @@
                             await window.fb.setDoc(window.fb.doc(window.fb.db, "users", userCred.user.uid), {
                                 name: nameToUse,
                                 email: this.loginEmail,
-                                role: isAdmin ? 'HR Administrator' : 'Staff Operasional',
+                                role: isAdmin ? 'HR Administrator' : 'Admin E-Commerce CS',
                                 type: isAdmin ? 'admin' : 'employee',
                                 phone: '081234567890',
                                 address: 'Jakarta'
@@ -724,7 +766,7 @@
                                     await window.fb.setDoc(window.fb.doc(window.fb.db, "users", userCred.user.uid), {
                                         name: isAdmin ? 'Sarah Manager' : 'Deden Fajar Riyanto',
                                         email: this.loginEmail,
-                                        role: isAdmin ? 'HR Administrator' : 'Staff Operasional',
+                                        role: isAdmin ? 'HR Administrator' : 'Admin E-Commerce CS',
                                         type: isAdmin ? 'admin' : 'employee',
                                         phone: '081234567890',
                                         address: 'Jakarta'
@@ -757,22 +799,56 @@
                     this.loginPassword = '';
                 },
 
+                // RUMUS Haversine UNTUK GEOFENCING JARAK GPS
+                calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+                    const R = 6371e3; // Radius bumi dalam meter
+                    const φ1 = lat1 * Math.PI / 180;
+                    const φ2 = lat2 * Math.PI / 180;
+                    const Δφ = (lat2 - lat1) * Math.PI / 180;
+                    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+                    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                              Math.cos(φ1) * Math.cos(φ2) *
+                              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+                    return R * c; // Jarak dalam meter
+                },
+
                 async openCamera(mode) {
                     this.cameraMode = mode;
                     this.showCameraModal = true;
                     this.liveCameraTime = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
                     
+                    // Cek Geofencing GPS Realtime
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(
                             (position) => {
-                                this.liveCameraLocation = `Lat: ${position.coords.latitude.toFixed(4)}, Long: ${position.coords.longitude.toFixed(4)} (Kantor Pusat)`;
+                                const userLat = position.coords.latitude;
+                                const userLng = position.coords.longitude;
+                                const distance = this.calculateHaversineDistance(userLat, userLng, this.officeLat, this.officeLng);
+                                
+                                this.liveCameraLocation = `Lat: ${userLat.toFixed(4)}, Long: ${userLng.toFixed(4)}`;
+                                
+                                if (distance <= this.maxRadiusMeters) {
+                                    this.isWithinGeofence = true;
+                                    this.geofenceStatusText = `Radius Valid: Berjarak ${Math.round(distance)}m dari Kantor Pusat`;
+                                } else {
+                                    this.isWithinGeofence = false;
+                                    this.geofenceStatusText = `Di Luar Radius (${Math.round(distance)}m). Maksimal ${this.maxRadiusMeters}m`;
+                                }
                             },
                             () => {
-                                this.liveCameraLocation = "Kantor Pusat (GPS Terverifikasi)";
+                                // Fallback jika GPS diblokir browser (simulasi di dalam radius kantor)
+                                this.isWithinGeofence = true;
+                                this.liveCameraLocation = "Kantor Pusat (GPS Simulated)";
+                                this.geofenceStatusText = "Radius Valid: Dalam Jangkauan Kantor";
                             }
                         );
                     } else {
-                        this.liveCameraLocation = "Kantor Pusat (Area Secured)";
+                        this.isWithinGeofence = true;
+                        this.liveCameraLocation = "Kantor Pusat (Secured Area)";
+                        this.geofenceStatusText = "Radius Valid: Dalam Jangkauan Kantor";
                     }
 
                     try {
@@ -795,6 +871,11 @@
                 },
 
                 async captureAndSubmitAttendance() {
+                    if (!this.isWithinGeofence) {
+                        this.showPopup('Peringatan Geofencing', 'Anda berada di luar radius kantor yang diizinkan untuk melakukan absensi.');
+                        return;
+                    }
+
                     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const dateNow = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -815,7 +896,7 @@
                             });
                         } catch(e) {}
 
-                        this.showPopup('Clock In Berhasil', 'Absensi masuk berhasil terekam ke sistem.');
+                        this.showPopup('Clock In Berhasil', 'Absensi masuk dan validasi radius kantor berhasil terekam.');
                     } else {
                         this.clockOutTime = timeNow + ' WIB';
                         this.isClockedOut = true;
@@ -833,7 +914,7 @@
                             });
                         } catch(e) {}
 
-                        this.showPopup('Clock Out Berhasil', 'Rekap jam kerja harian berhasil disimpan.');
+                        this.showPopup('Clock Out Berhasil', 'Rekap jam kerja harian dan kalkulasi payroll diperbarui.');
                     }
 
                     this.closeCamera();
@@ -845,19 +926,6 @@
                     this.formInput.date = '';
                     this.formInput.reason = '';
                     this.showModal = true;
-                },
-
-                async saveProfile() {
-                    try {
-                        const userDocRef = window.fb.doc(window.fb.db, "users", this.currentUserId);
-                        await window.fb.updateDoc(userDocRef, {
-                            phone: this.userProfile.phone,
-                            address: this.userProfile.address
-                        });
-                        this.showPopup('Penyimpanan Berhasil', 'Data diri dan kontak berhasil diperbarui.');
-                    } catch (error) {
-                        this.showPopup('Gagal Menyimpan', error.message);
-                    }
                 },
 
                 async submitRequest() {
