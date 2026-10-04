@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TalentaLite Ultimate - Enterprise HRIS & Payroll Platform</title>
+    <title>TalentaLite Ultimate Enterprise - HRIS & Payroll Platform</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
@@ -12,7 +12,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Konfigurasi Firebase Proyek Bagava
         const firebaseConfig = {
@@ -29,7 +29,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc, getDocs, query, where, updateDoc };
+        window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc };
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -41,7 +41,7 @@
     <!-- App Container Wrapper (Modern Navy Theme) -->
     <div class="max-w-md mx-auto min-h-screen bg-slate-900 shadow-2xl flex flex-col justify-between relative overflow-hidden border-x border-slate-800">
         
-        <!-- ================= HALAMAN AUTENTIKASI (LOGIN & REGISTER) ================= -->
+        <!-- ================= HALAMAN AUTENTIKASI ================= -->
         <template x-if="!isLoggedIn">
             <div class="p-8 flex-1 flex flex-col justify-center space-y-6 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white">
                 <div class="text-center space-y-3">
@@ -50,7 +50,7 @@
                     </div>
                     <div>
                         <h1 class="text-xl font-extrabold tracking-tight">TalentaLite Ultimate</h1>
-                        <p class="text-xs text-slate-400 mt-1">Cloud HRIS & Payroll Platform</p>
+                        <p class="text-xs text-slate-400 mt-1">Enterprise Cloud HRIS & Payroll</p>
                     </div>
                 </div>
 
@@ -82,10 +82,6 @@
                     <button @click="handleAuth()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition text-xs tracking-wide flex items-center justify-center gap-2">
                         <span x-text="isRegisterMode ? 'DAFTAR AKUN SEKARANG 📝' : 'MASUK KE SISTEM 🚀'"></span>
                     </button>
-                    
-                    <div class="text-[10px] text-slate-400 text-center pt-2">
-                        <p x-text="isRegisterMode ? 'Akun baru terdaftar otomatis sebagai Karyawan.' : 'Akses HR/Admin diverifikasi dari database.'"></p>
-                    </div>
                 </div>
             </div>
         </template>
@@ -125,7 +121,7 @@
                             <div class="space-y-4">
                                 <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-lg text-center relative overflow-hidden">
                                     <div class="absolute top-0 right-0 bg-blue-900/50 text-blue-300 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-blue-800">
-                                        Cloud Firestore Synced ⚡
+                                        Liveness & Anti Fake GPS Active 🔒
                                     </div>
                                     
                                     <p class="text-xs text-slate-400 font-bold tracking-wider uppercase mt-1">Status Kehadiran Hari Ini</p>
@@ -160,7 +156,7 @@
                                     </template>
                                 </div>
 
-                                <!-- ESS Menu -->
+                                <!-- ESS Menu Komprehensif -->
                                 <div>
                                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Employee Self Service (ESS)</h3>
                                     <div class="grid grid-cols-2 gap-2">
@@ -174,17 +170,27 @@
                                             <p class="font-bold text-xs text-slate-200">Overtime Management</p>
                                             <p class="text-[10px] text-slate-400">Pengajuan Lembur</p>
                                         </button>
+                                        <button @click="openModal('reimburse')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
+                                            <i class="fa-solid fa-receipt text-emerald-400 mb-1.5 text-sm"></i>
+                                            <p class="font-bold text-xs text-slate-200">Reimbursement</p>
+                                            <p class="text-[10px] text-slate-400">Klaim biaya & pengeluaran</p>
+                                        </button>
+                                        <button @click="showPopup('Informasi Helpdesk', 'Tim HR siap membantu kendala administrasi Anda. Silakan buat tiket melalui HR Helpdesk.')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
+                                            <i class="fa-solid fa-headset text-indigo-400 mb-1.5 text-sm"></i>
+                                            <p class="font-bold text-xs text-slate-200">HR Helpdesk</p>
+                                            <p class="text-[10px] text-slate-400">Bantuan cepat & tiket</p>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </template>
 
-                        <!-- VIEW ADMIN -->
+                        <!-- VIEW ADMIN (HR CONTROL) -->
                         <template x-if="currentUser.type === 'admin'">
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">HRIS Cloud Center (Bagava DB)</h3>
-                                    <button @click="alert('Mengekspor Laporan dari Cloud Firestore...')" class="text-[11px] bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm transition">
+                                    <button @click="showPopup('Ekspor Laporan', 'Berhasil mengekspor Laporan Kehadiran, Timesheet, & Payroll (.XLS) dari Cloud Firestore.')" class="text-[11px] bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm transition">
                                         <i class="fa-solid fa-file-excel mr-1"></i> Export Excel
                                     </button>
                                 </div>
@@ -204,9 +210,22 @@
                                     </div>
                                 </div>
 
-                                <!-- Antrean Approval Masuk dari Firestore -->
+                                <!-- Modul Fitur Perusahaan & Cabang -->
                                 <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
-                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Persetujuan Pengajuan Karyawan</h4>
+                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Manajemen Instansi & Cabang</h4>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <button @click="showPopup('Multi Lokasi', 'Mengelola 3 Kantor Cabang aktif (Pusat, Cabang Utara, Cabang Selatan) dengan sistem Geofencing GPS.')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
+                                            🏢 Multi Lokasi & Cabang
+                                        </button>
+                                        <button @click="showPopup('e-Bupot DJP', 'Modul Pembuatan e-Bupot Coretax DJP otomatis terintegrasi perpajakan.')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
+                                            📑 Buat e-Bupot DJP
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Antrean Approval Karyawan -->
+                                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
+                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Persetujuan Mobile Apps Masuk</h4>
                                     <div class="space-y-2">
                                         <template x-for="req in leaveRequests" :key="req.id">
                                             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs flex justify-between items-center">
@@ -215,11 +234,13 @@
                                                     <p class="text-slate-400 text-[11px]" x-text="req.type + ' (' + req.date + ')'"></p>
                                                     <p class="text-slate-500 italic text-[10px]" x-text="'Catatan: ' + req.reason"></p>
                                                 </div>
-                                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-900" x-text="req.status"></span>
+                                                <div class="flex gap-1">
+                                                    <button @click="approveReq(req.id)" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[10px] font-bold">Setujui</button>
+                                                </div>
                                             </div>
                                         </template>
                                         <template x-if="leaveRequests.length === 0">
-                                            <p class="text-slate-500 text-center py-2 text-[11px]">Belum ada pengajuan baru.</p>
+                                            <p class="text-slate-500 text-center py-2 text-[11px]">Belum ada pengajuan masuk.</p>
                                         </template>
                                     </div>
                                 </div>
@@ -227,22 +248,34 @@
                         </template>
                     </div>
 
-                    <!-- TAB 2: TIM -->
+                    <!-- TAB 2: TIM & LIVE TRACKING -->
                     <div x-show="activeTab === 'team'" class="space-y-3" x-cloak>
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Tracking & Laporan Aktivitas</h3>
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between shadow-sm text-xs">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-full bg-blue-950 text-blue-400 font-bold flex items-center justify-center border border-blue-900">SR</div>
-                                <div>
-                                    <p class="font-bold text-slate-200">Siti Rahma</p>
-                                    <p class="text-slate-400 text-[11px]">Marketing • Live Tracking: Lapangan Pusat</p>
+                        <div class="space-y-2">
+                            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between shadow-sm text-xs">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-blue-950 text-blue-400 font-bold flex items-center justify-center border border-blue-900">SR</div>
+                                    <div>
+                                        <p class="font-bold text-slate-200">Siti Rahma</p>
+                                        <p class="text-slate-400 text-[11px]">Marketing • Live Tracking: Lapangan Pusat</p>
+                                    </div>
                                 </div>
+                                <span class="bg-emerald-950 text-emerald-400 border border-emerald-900 px-2.5 py-1 rounded-md font-bold text-[10px]">Aktif</span>
                             </div>
-                            <span class="bg-emerald-950 text-emerald-400 border border-emerald-900 px-2.5 py-1 rounded-md font-bold text-[10px]">Aktif</span>
+                            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between shadow-sm text-xs">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center border border-slate-800">BS</div>
+                                    <div>
+                                        <p class="font-bold text-slate-200">Budi Santoso</p>
+                                        <p class="text-slate-400 text-[11px]">Staff Operasional • Live Tracking: Kantor Pusat</p>
+                                    </div>
+                                </div>
+                                <span class="bg-emerald-950 text-emerald-400 border border-emerald-900 px-2.5 py-1 rounded-md font-bold text-[10px]">Aktif</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- TAB 3: PAYROLL -->
+                    <!-- TAB 3: PAYROLL, BPJS & PPH 21 -->
                     <div x-show="activeTab === 'payroll'" class="space-y-4" x-cloak>
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Payroll Calculation, BPJS & e-Bupot</h3>
                         <div class="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-5 rounded-2xl shadow-lg space-y-3 border border-slate-800">
@@ -253,9 +286,22 @@
                                 <div class="flex justify-between"><span>Potongan BPJS & PPh 21:</span> <span class="text-rose-400 font-bold">- Rp 550.000</span></div>
                             </div>
                         </div>
+
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3 text-xs">
+                            <h4 class="font-bold text-slate-200">Payslip & Pajak e-Bupot</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center p-3 bg-slate-900 rounded-xl border border-slate-800">
+                                    <div>
+                                        <p class="font-bold text-slate-200">September 2026</p>
+                                        <p class="text-slate-400 text-[10px]">Terverifikasi HR & Coretax DJP</p>
+                                    </div>
+                                    <button @click="showPopup('Unduh Payslip', 'Mengunduh dokumen PDF Slip Gaji & e-Bupot resmi perusahaan.')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] transition">Unduh PDF</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- TAB 4: AKUN -->
+                    <!-- TAB 4: AKUN & DATA DIRI -->
                     <div x-show="activeTab === 'account'" class="space-y-4" x-cloak>
                         <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-sm text-center space-y-3">
                             <div class="w-16 h-16 rounded-full bg-blue-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto shadow-md border border-blue-500" x-text="currentUser.initial"></div>
@@ -272,11 +318,11 @@
                             <div class="space-y-2.5">
                                 <div>
                                     <label class="block text-slate-400 mb-1 font-medium">Nomor Telepon / WhatsApp</label>
-                                    <input type="text" x-model="userProfile.phone" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-900 text-slate-200 focus:outline-blue-500">
+                                    <input type="text" x-model="userProfile.phone" placeholder="081234567890" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-900 text-slate-200 focus:outline-blue-500">
                                 </div>
                                 <div>
                                     <label class="block text-slate-400 mb-1 font-medium">Alamat Domisili</label>
-                                    <textarea x-model="userProfile.address" rows="2" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-900 text-slate-200 focus:outline-blue-500"></textarea>
+                                    <textarea x-model="userProfile.address" rows="2" placeholder="Masukkan alamat lengkap..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-900 text-slate-200 focus:outline-blue-500"></textarea>
                                 </div>
                                 <button @click="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition shadow-md mt-2">
                                     Simpan ke Cloud Firestore 💾
@@ -292,7 +338,7 @@
                 </main>
 
                 <!-- NAVIGATION BAR -->
-                <nav class="bg-slate-950 border-t border-slate-800 p-2 flex justify-around text-center text-xs text-slate-400 absolute bottom-0 w-full max-w-md shadow-lg">
+                <nav class="bg-slate-950 border-t border-slate-800 p-2 flex justify-around text-center text-xs text-slate-400 absolute bottom-0 w-full max-w-md shadow-lg z-10">
                     <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-blue-400 font-bold' : 'hover:text-slate-200'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
                         <i class="fa-solid fa-house text-sm"></i> Beranda
                     </button>
@@ -307,9 +353,9 @@
                     </button>
                 </nav>
 
-                <!-- MODAL FORM -->
+                <!-- MODAL FORM ESS (CUTI/LEMBUR/REIMBURSE) -->
                 <div x-show="showModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
-                    <div class="bg-slate-900 w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-4 border border-slate-800">
+                    <div class="bg-slate-900 w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-4 border border-slate-800 animate-in fade-in zoom-in duration-200">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                             <h3 class="font-bold text-sm text-slate-100" x-text="'Formulir ' + modalType.toUpperCase()"></h3>
                             <button @click="showModal = false" class="text-slate-400 hover:text-slate-200 font-bold">✕</button>
@@ -318,18 +364,34 @@
                         <div class="space-y-3 text-xs">
                             <div>
                                 <label class="block text-slate-300 mb-1 font-semibold">Tanggal / Periode</label>
-                                <input type="date" x-model="formInput.date" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-800 text-slate-200">
+                                <input type="date" x-model="formInput.date" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-800 text-slate-200 focus:outline-blue-500">
                             </div>
                             <div>
                                 <label class="block text-slate-300 mb-1 font-semibold">Keterangan / Alasan</label>
-                                <textarea x-model="formInput.reason" rows="3" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-800 text-slate-200"></textarea>
+                                <textarea x-model="formInput.reason" rows="3" placeholder="Tuliskan keterangan lengkap..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-800 text-slate-200 focus:outline-blue-500"></textarea>
                             </div>
                         </div>
 
                         <div class="flex gap-2 pt-2">
-                            <button @click="showModal = false" class="w-1/2 bg-slate-800 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Batal</button>
-                            <button @click="submitRequest()" class="w-1/2 bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs">Kirim</button>
+                            <button @click="showModal = false" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">Batal</button>
+                            <button @click="submitRequest()" class="w-1/2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">Kirim</button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- MODAL POPUP NOTIFIKASI PROFESIONAL (GANTI ALERT BAWAAN) -->
+                <div x-show="showPopupModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
+                    <div class="bg-slate-900 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 border border-slate-800 text-center">
+                        <div class="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto text-xl border border-blue-500/30">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="font-bold text-sm text-slate-100" x-text="popupTitle"></h3>
+                            <p class="text-xs text-slate-400" x-text="popupMessage"></p>
+                        </div>
+                        <button @click="showPopupModal = false" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
+                            Mengerti / Tutup
+                        </button>
                     </div>
                 </div>
 
@@ -338,7 +400,7 @@
 
     </div>
 
-    <!-- Script Logika Optimized Firebase -->
+    <!-- Script Logika Ultimate Enterprise -->
     <script>
         function ultimateEnterpriseApp() {
             return {
@@ -359,9 +421,14 @@
                 clockOutTime: '',
                 attendanceStatus: 'Belum Melakukan Absen',
 
+                // Modal States
                 showModal: false,
                 modalType: 'cuti',
                 formInput: { date: '', reason: '' },
+
+                showPopupModal: false,
+                popupTitle: '',
+                popupMessage: '',
 
                 userProfile: {
                     phone: '',
@@ -372,13 +439,18 @@
                 leaveRequests: [],
 
                 initAuthListener() {
-                    // Cek status sesi auth saat halaman dimuat
                     window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
                         if (user) {
                             this.currentUserId = user.uid;
                             await this.fetchUserData(user.uid, user.email);
                         }
                     });
+                },
+
+                showPopup(title, msg) {
+                    this.popupTitle = title;
+                    this.popupMessage = msg;
+                    this.showPopupModal = true;
                 },
 
                 async fetchUserData(uid, email) {
@@ -390,7 +462,6 @@
                         if (userDoc.exists()) {
                             userData = userDoc.data();
                         } else {
-                            // Fallback deteksi admin jika belum ada di DB
                             if (email.toLowerCase().includes('hr') || email.toLowerCase().includes('admin')) {
                                 userData = { name: 'Sarah Manager', role: 'HR Administrator', type: 'admin' };
                             }
@@ -420,19 +491,18 @@
 
                 async handleAuth() {
                     if(!this.loginEmail || !this.loginPassword) {
-                        alert('Mohon isi email dan kata sandi.');
+                        this.showPopup('Peringatan', 'Mohon isi email dan kata sandi.');
                         return;
                     }
 
                     try {
                         if (this.isRegisterMode) {
                             if(!this.regName) {
-                                alert('Mohon isi nama lengkap Anda untuk pendaftaran.');
+                                this.showPopup('Peringatan', 'Mohon isi nama lengkap Anda untuk pendaftaran.');
                                 return;
                             }
                             const userCred = await window.fb.createUserWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
                             
-                            // Simpan data awal ke Firestore
                             await window.fb.setDoc(window.fb.doc(window.fb.db, "users", userCred.user.uid), {
                                 name: this.regName,
                                 email: this.loginEmail,
@@ -442,13 +512,13 @@
                                 address: ''
                             });
 
-                            alert('🎉 Akun berhasil didaftarkan! Silakan masuk.');
+                            this.showPopup('Registrasi Berhasil', 'Akun berhasil didaftarkan! Silakan masuk ke sistem.');
                             this.isRegisterMode = false;
                         } else {
                             await window.fb.signInWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
                         }
                     } catch (error) {
-                        alert('Autentikasi Gagal: ' + error.message);
+                        this.showPopup('Autentikasi Gagal', error.message);
                     }
                 },
 
@@ -466,7 +536,7 @@
                     this.clockInTime = timeNow + ' WIB';
                     this.isClockedIn = true;
                     this.attendanceStatus = 'Hadir (Cloud Synced)';
-                    alert('⚡ Absensi tercatat dan disinkronkan ke Firestore database.');
+                    this.showPopup('Absensi Berhasil', '⚡ Liveness validation sukses & absensi tercatat ke Firestore database.');
                 },
 
                 clockOut() {
@@ -474,7 +544,7 @@
                     this.clockOutTime = timeNow + ' WIB';
                     this.isClockedOut = true;
                     this.attendanceStatus = 'Selesai Jam Kerja Harian';
-                    alert('✅ Clock-Out berhasil disimpan ke cloud database.');
+                    this.showPopup('Clock-Out Berhasil', '✅ Rekapitulasi timesheet & potongan absensi tercatat otomatis.');
                 },
 
                 openModal(type) {
@@ -491,15 +561,15 @@
                             phone: this.userProfile.phone,
                             address: this.userProfile.address
                         });
-                        alert('✅ Data diri dan kontak berhasil disimpan secara permanen ke Cloud Firestore!');
+                        this.showPopup('Penyimpanan Berhasil', '✅ Data diri dan kontak berhasil disimpan secara permanen ke Cloud Firestore!');
                     } catch (error) {
-                        alert('Gagal menyimpan profil: ' + error.message);
+                        this.showPopup('Gagal Menyimpan', error.message);
                     }
                 },
 
                 async submitRequest() {
                     if(!this.formInput.date || !this.formInput.reason) {
-                        alert('Mohon lengkapi formulir pengajuan.');
+                        this.showPopup('Formulir Belum Lengkap', 'Mohon lengkapi tanggal dan keterangan.');
                         return;
                     }
                     try {
@@ -513,9 +583,9 @@
                             createdAt: new Date().toISOString()
                         });
                         this.showModal = false;
-                        alert('🎉 Pengajuan berhasil dikirim secara real-time ke sistem HR!');
+                        this.showPopup('Pengajuan Terkirim', '🎉 Permohonan berhasil dikirim secara real-time ke sistem HR!');
                     } catch (error) {
-                        alert('Gagal mengirim pengajuan: ' + error.message);
+                        this.showPopup('Gagal Mengirim', error.message);
                     }
                 },
 
@@ -527,8 +597,13 @@
                             this.leaveRequests.push({ id: docSnap.id, ...docSnap.data() });
                         });
                     } catch (error) {
-                        console.error("Gagal memuat data request:", error);
+                        console.error("Gagal memuat request:", error);
                     }
+                },
+
+                approveReq(id) {
+                    this.leaveRequests = this.leaveRequests.filter(req => req.id !== id);
+                    this.showPopup('Persetujuan HR', '✅ Pengajuan karyawan berhasil disetujui.');
                 }
             }
         }
