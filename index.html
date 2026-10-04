@@ -12,7 +12,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Konfigurasi Firebase Proyek Bagava
         const firebaseConfig = {
@@ -29,7 +29,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc };
+        window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc };
         window.isFirebaseReady = true;
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,7 +37,6 @@
         [x-cloak] { display: none !important; }
         body { -webkit-user-select: none; user-select: none; background-color: #020617; }
         input, textarea, select { -webkit-user-select: text; user-select: text; }
-        /* Efek Mirror Kamera Depan */
         #cameraStream {
             transform: scaleX(-1);
             -webkit-transform: scaleX(-1);
@@ -46,7 +45,7 @@
 </head>
 <body class="font-sans antialiased text-slate-100 flex justify-center items-center min-h-screen" x-data="ultimateEnterpriseApp()" x-init="initAuthListener()">
 
-    <!-- App Container Wrapper (Mobile Native Frame Ready for PlayStore/AppStore) -->
+    <!-- App Container Wrapper -->
     <div class="w-full max-w-md h-screen md:h-[844px] bg-slate-950 text-slate-100 shadow-2xl flex flex-col justify-between relative overflow-hidden md:rounded-[3rem] md:border-8 md:border-slate-800">
         
         <!-- ================= HALAMAN AUTENTIKASI ================= -->
@@ -85,11 +84,11 @@
                 </div>
 
                 <button @click="handleAuth()" :disabled="isLoading" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition text-xs tracking-wide flex items-center justify-center gap-2">
-                    <span x-text="isLoading ? 'Memproses ke Server...' : (isRegisterMode ? 'DAFTAR AKUN BARU 📝' : 'MASUK KE SISTEM 🚀')"></span>
+                    <span x-text="isLoading ? 'Memproses ke Server...' : (isRegisterMode ? 'Daftar Akun Baru' : 'Masuk ke Sistem')"></span>
                 </button>
                 
                 <div class="text-[10px] text-slate-400 text-center pt-1">
-                    <p>💡 Email mengandung <code class="text-blue-400">hr</code> / <code class="text-blue-400">admin</code> otomatis jadi HR.</p>
+                    <p>Catatan: Email yang mengandung <code class="text-blue-400">hr</code> atau <code class="text-blue-400">admin</code> akan otomatis masuk sebagai Administrator HR.</p>
                 </div>
             </div>
         </div>
@@ -102,63 +101,82 @@
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-md border border-blue-500/30" x-text="currentUser.initial"></div>
                     <div>
-                        <p class="text-[11px] text-slate-400 font-medium">Selamat malam,</p>
+                        <p class="text-[11px] text-slate-400 font-medium" x-text="currentUser.role"></p>
                         <h1 class="text-xs font-bold tracking-tight text-slate-200" x-text="currentUser.name"></h1>
                     </div>
                 </div>
-                <button @click="showPopup('Notifikasi', 'Tidak ada pemberitahuan baru saat ini.')" class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-blue-400 relative hover:bg-slate-700 transition border border-slate-700">
-                    <i class="fa-solid fa-gift text-sm"></i>
+                <button @click="activeTab = 'inbox'" class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-blue-400 relative hover:bg-slate-700 transition border border-slate-700">
+                    <i class="fa-solid fa-bell text-sm"></i>
+                    <template x-if="unreadInboxCount > 0">
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center" x-text="unreadInboxCount"></span>
+                    </template>
                 </button>
             </header>
 
             <!-- KONTEN UTAMA SCROLLABLE -->
             <main class="flex-1 overflow-y-auto pb-28 space-y-4 p-4">
 
-                <!-- TAB 1: BERANDA -->
+                <!-- ================= TAB 1: BERANDA ================= -->
                 <div x-show="activeTab === 'home'" class="space-y-4" x-cloak>
                     
-                    <!-- KARTU SHIFT & CLOCK IN / CLOCK OUT INTERAKTIF -->
-                    <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800 text-center relative overflow-hidden space-y-3">
-                        <div class="absolute top-0 right-0 bg-blue-900/60 text-blue-300 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-blue-800">
-                            Shift Aktif: Normal 🔒
-                        </div>
-                        
-                        <p class="text-xs font-medium text-slate-400">Sun, 04 Oct 2026</p>
-                        
-                        <div>
-                            <h2 class="text-sm font-extrabold text-slate-200" x-text="attendanceStatus"></h2>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
-                            <div>
-                                <p class="text-slate-400 font-medium">Clock-In</p>
-                                <p class="font-bold text-blue-400 text-sm" x-text="clockInTime || '--:--'"></p>
+                    <!-- KARTU KHUSUS HR ADMIN -->
+                    <template x-if="currentUser.type === 'admin'">
+                        <div class="bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 text-white p-5 rounded-2xl shadow-xl border border-blue-900 space-y-3">
+                            <div class="flex justify-between items-center border-b border-blue-900/60 pb-2">
+                                <h3 class="font-bold text-xs uppercase tracking-wider text-blue-400"><i class="fa-solid fa-shield-halved mr-1.5"></i> Panel Kendali Administrator HR</h3>
+                                <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded font-bold">Akses Penuh</span>
                             </div>
+                            <p class="text-xs text-slate-300">Anda memiliki wewenang untuk meninjau dan menyetujui seluruh pengajuan cuti, absensi, serta perubahan data staff.</p>
+                            <button @click="activeTab = 'team'" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow">
+                                Tinjau Pengajuan Masuk (<span x-text="leaveRequests.length"></span>)
+                            </button>
+                        </div>
+                    </template>
+
+                    <!-- KARTU SHIFT & CLOCK IN / CLOCK OUT (KHUSUS STAFF) -->
+                    <template x-if="currentUser.type !== 'admin'">
+                        <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800 text-center relative overflow-hidden space-y-3">
+                            <div class="absolute top-0 right-0 bg-blue-900/60 text-blue-300 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-blue-800">
+                                Shift Aktif: Normal
+                            </div>
+                            
+                            <p class="text-xs font-medium text-slate-400">Sun, 04 Oct 2026</p>
+                            
                             <div>
-                                <p class="text-slate-400 font-medium">Clock-Out</p>
-                                <p class="font-bold text-blue-400 text-sm" x-text="clockOutTime || '--:--'"></p>
+                                <h2 class="text-sm font-extrabold text-slate-200" x-text="attendanceStatus"></h2>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                                <div>
+                                    <p class="text-slate-400 font-medium">Clock-In</p>
+                                    <p class="font-bold text-blue-400 text-sm" x-text="clockInTime || '--:--'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400 font-medium">Clock-Out</p>
+                                    <p class="font-bold text-blue-400 text-sm" x-text="clockOutTime || '--:--'"></p>
+                                </div>
+                            </div>
+
+                            <!-- Tombol Aksi Shift -->
+                            <div class="pt-1">
+                                <template x-if="!isClockedIn">
+                                    <button @click="openCamera('in')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                                        <i class="fa-solid fa-camera"></i> Buka Kamera & Clock In
+                                    </button>
+                                </template>
+                                <template x-if="isClockedIn && !isClockedOut">
+                                    <button @click="openCamera('out')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                                        <i class="fa-solid fa-camera-rotate"></i> Buka Kamera & Clock Out
+                                    </button>
+                                </template>
+                                <template x-if="isClockedIn && isClockedOut">
+                                    <p class="text-xs text-emerald-400 font-semibold bg-emerald-950/50 py-2.5 rounded-lg border border-emerald-900">Kehadiran shift hari ini telah terekam.</p>
+                                </template>
                             </div>
                         </div>
+                    </template>
 
-                        <!-- Tombol Aksi Shift -->
-                        <div class="pt-1">
-                            <template x-if="!isClockedIn">
-                                <button @click="openCamera('in')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
-                                    <i class="fa-solid fa-camera"></i> Buka Kamera & Clock In ⚡
-                                </button>
-                            </template>
-                            <template x-if="isClockedIn && !isClockedOut">
-                                <button @click="openCamera('out')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
-                                    <i class="fa-solid fa-camera-rotate"></i> Buka Kamera & Clock Out
-                                </button>
-                            </template>
-                            <template x-if="isClockedIn && isClockedOut">
-                                <p class="text-xs text-emerald-400 font-semibold bg-emerald-950/50 py-2.5 rounded-lg border border-emerald-900">✨ Kehadiran shift hari ini telah terekam.</p>
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- GRID MENU UTAMA TEMA NAVY -->
+                    <!-- GRID MENU UTAMA -->
                     <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 grid grid-cols-3 gap-4 text-center text-xs">
                         <button @click="openModal('Reimbursement')" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-cyan-950 text-cyan-400 flex items-center justify-center text-lg shadow-sm border border-cyan-900 group-hover:scale-105 transition">
@@ -183,7 +201,7 @@
                             <div class="w-12 h-12 rounded-2xl bg-amber-950 text-amber-400 flex items-center justify-center text-lg shadow-sm border border-amber-900 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-calendar-check"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-300">Daftar Kehadiran</span>
+                            <span class="text-[11px] font-medium text-slate-300">Kehadiran</span>
                         </button>
                         <button @click="activeTab = 'payroll'" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-blue-950 text-blue-400 flex items-center justify-center text-lg shadow-sm border border-blue-900 group-hover:scale-105 transition">
@@ -195,15 +213,15 @@
                             <div class="w-12 h-12 rounded-2xl bg-slate-800 text-slate-200 flex items-center justify-center text-lg shadow-sm border border-slate-700 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-grip"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-300">Semua Aplikasi</span>
+                            <span class="text-[11px] font-medium text-slate-300">Menu Lain</span>
                         </button>
                     </div>
 
-                    <!-- BANNER PROMO / INFO NAVY -->
+                    <!-- BANNER INFORMASI -->
                     <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-4 rounded-2xl shadow-md flex justify-between items-center relative overflow-hidden border border-blue-800/60">
                         <div class="space-y-1 w-2/3">
-                            <h3 class="text-xs font-bold leading-tight">Makin flexible! Kini performance review dapat dilakukan di Mobile App</h3>
-                            <button @click="showPopup('Performance Review', 'Fitur review kinerja mandiri sudah aktif.')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-lg shadow transition mt-1">Coba sekarang</button>
+                            <h3 class="text-xs font-bold leading-tight">Evaluasi kinerja triwulan kini dapat diakses melalui aplikasi seluler.</h3>
+                            <button @click="showPopup('Informasi', 'Fitur tinjauan kinerja mandiri aktif.')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-lg shadow transition mt-1">Selengkapnya</button>
                         </div>
                         <div class="text-3xl text-blue-400 opacity-90">
                             <i class="fa-solid fa-clipboard-list"></i>
@@ -213,33 +231,62 @@
                     <!-- BAGIAN PENGUMUMAN -->
                     <div class="bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Pengumuman</h3>
-                            <button @click="showPopup('Semua Pengumuman', 'Seluruh arsip pengumuman instansi tersedia.')" class="text-xs text-blue-400 font-semibold hover:underline">Lihat semua</button>
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Pengumuman Perusahaan</h3>
+                            <button @click="showPopup('Pengumuman', 'Seluruh arsip pengumuman instansi tersedia.')" class="text-xs text-blue-400 font-semibold hover:underline">Lihat semua</button>
                         </div>
 
                         <div class="space-y-3 text-xs divide-y divide-slate-800">
                             <div class="pt-2 flex justify-between items-start">
                                 <div class="space-y-0.5 pr-2">
-                                    <p class="font-bold text-slate-200 leading-snug">KELENGKAPAN ADMINISTRASI ABSENSI – SEPTEMBER 2026</p>
-                                    <p class="text-[11px] text-slate-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Indrawan</p>
+                                    <p class="font-bold text-slate-200 leading-snug">Kelengkapan Administrasi Absensi Periode Berjalan</p>
+                                    <p class="text-[11px] text-slate-400">Departemen SDM</p>
                                 </div>
-                                <span class="text-[10px] text-slate-500 shrink-0 font-medium">29 Sep</span>
-                            </div>
-                            <div class="pt-3 flex justify-between items-start">
-                                <div class="space-y-0.5 pr-2">
-                                    <p class="font-bold text-slate-200 leading-snug">KELENGKAPAN ADMINISTRASI</p>
-                                    <p class="text-[11px] text-slate-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> HR Department</p>
-                                </div>
-                                <span class="text-[10px] text-slate-500 shrink-0 font-medium">28 Aug</span>
+                                <span class="text-[10px] text-slate-500 shrink-0 font-medium">04 Okt</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 2: DAFTAR KEHADIRAN / TIMESHEET -->
+                <!-- ================= TAB 2: PENGAJUAN & PERSETUJUAN (TEAM/APPROVAL) ================= -->
                 <div x-show="activeTab === 'team'" class="space-y-4" x-cloak>
+                    
+                    <!-- TAMPILAN KHUSUS HR ADMIN (SETUJU / TOLAK) -->
+                    <template x-if="currentUser.type === 'admin'">
+                        <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                                <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Persetujuan Pengajuan Staff</h3>
+                                <span class="text-[10px] bg-blue-950 text-blue-400 border border-blue-900 px-2 py-0.5 rounded font-bold"><span x-text="leaveRequests.length"></span> Menunggu</span>
+                            </div>
+                            <div class="space-y-2">
+                                <template x-for="req in leaveRequests" :key="req.id">
+                                    <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-2">
+                                        <div class="flex justify-between items-center">
+                                            <span class="font-bold text-blue-400" x-text="req.name"></span>
+                                            <span class="text-[10px] text-slate-400" x-text="req.date"></span>
+                                        </div>
+                                        <p class="text-slate-300 font-semibold" x-text="req.type"></p>
+                                        <p class="text-slate-400 text-[11px]" x-text="'Alasan: ' + req.reason"></p>
+                                        <div class="flex gap-2 pt-1">
+                                            <button @click="approveRequest(req.id)" class="w-1/2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-1.5 rounded-lg text-[10px] transition">Setujui</button>
+                                            <button @click="rejectRequest(req.id)" class="w-1/2 bg-rose-950/80 hover:bg-rose-900 text-rose-400 border border-rose-900 font-bold py-1.5 rounded-lg text-[10px] transition">Tolak</button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template x-if="leaveRequests.length === 0">
+                                    <p class="text-slate-500 text-center py-6 text-xs">Tidak ada pengajuan yang memerlukan persetujuan.</p>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- TAMPILAN RIWAYAT UNTUK STAFF -->
                     <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 space-y-3">
-                        <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Daftar Kehadiran & Riwayat Shift</h3>
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Riwayat Kehadiran & Shift</h3>
+                            <button @click="showAjukanModal = true" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow transition">
+                                <i class="fa-solid fa-plus mr-1"></i> Buat Pengajuan
+                            </button>
+                        </div>
                         <div class="space-y-2">
                             <template x-for="att in attendanceHistory" :key="att.id">
                                 <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-2">
@@ -261,37 +308,35 @@
                                 </div>
                             </template>
                             <template x-if="attendanceHistory.length === 0">
-                                <div class="text-center py-8 space-y-2">
-                                    <i class="fa-solid fa-calendar-xmark text-slate-600 text-2xl"></i>
-                                    <p class="text-slate-500 text-xs">Belum ada riwayat kehadiran tercatat.</p>
-                                </div>
+                                <p class="text-slate-500 text-center py-6 text-xs">Belum ada riwayat kehadiran tercatat.</p>
                             </template>
                         </div>
                     </div>
+                </div>
 
-                    <!-- RIWAYAT PENGAJUAN MANDIRI -->
+                <!-- ================= TAB 3: INBOX PESAN & NOTIFIKASI ================= -->
+                <div x-show="activeTab === 'inbox'" class="space-y-4" x-cloak>
                     <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Riwayat Pengajuan</h3>
-                            <button @click="showAjukanModal = true" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow transition">
-                                <i class="fa-solid fa-plus mr-1"></i> Buat Pengajuan
-                            </button>
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Pesan Masuk & Notifikasi</h3>
+                            <button @click="markAllInboxRead()" class="text-[10px] text-blue-400 font-semibold hover:underline">Tandai Semua Dibaca</button>
                         </div>
-                        <div class="space-y-2">
-                            <template x-for="req in leaveRequests" :key="req.id">
-                                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs flex justify-between items-center">
-                                    <div class="space-y-0.5">
-                                        <p class="font-bold text-slate-200" x-text="req.type + ' - ' + req.date"></p>
-                                        <p class="text-slate-400 text-[11px]" x-text="req.reason"></p>
+
+                        <div class="space-y-2.5">
+                            <template x-for="item in inboxMessages" :key="item.id">
+                                <div @click="item.read = true" class="p-3.5 rounded-xl border text-xs space-y-1 transition cursor-pointer" :class="item.read ? 'bg-slate-950/60 border-slate-800/80 text-slate-400' : 'bg-slate-950 border-blue-900/60 text-slate-200 shadow-sm'">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-bold" :class="item.read ? 'text-slate-400' : 'text-blue-400'" x-text="item.title"></span>
+                                        <span class="text-[10px] text-slate-500" x-text="item.time"></span>
                                     </div>
-                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-900" x-text="req.status"></span>
+                                    <p class="text-[11px] leading-relaxed" x-text="item.message"></p>
                                 </div>
                             </template>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 3: PAYROLL / SLIP GAJI -->
+                <!-- ================= TAB 4: PAYROLL / SLIP GAJI ================= -->
                 <div x-show="activeTab === 'payroll'" class="space-y-4" x-cloak>
                     <div class="bg-gradient-to-br from-blue-950 via-slate-900 to-slate-950 text-white p-5 rounded-2xl shadow-lg space-y-3 border border-slate-800">
                         <p class="text-xs text-blue-300 font-medium">Take Home Pay (September 2026)</p>
@@ -302,11 +347,11 @@
                         </div>
                     </div>
                     <button @click="showPopup('Unduh Payslip', 'Slip Gaji resmi berformat PDF berhasil diunduh.')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs shadow-md transition">
-                        Unduh Slip Gaji & e-Bupot (.PDF) 📥
+                        Unduh Slip Gaji & e-Bupot (.PDF)
                     </button>
                 </div>
 
-                <!-- TAB 4: AKUN & PROFIL -->
+                <!-- ================= TAB 5: AKUN & PROFIL ================= -->
                 <div x-show="activeTab === 'account'" class="space-y-4" x-cloak>
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-center space-y-3">
                         <div class="w-16 h-16 rounded-full bg-blue-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto shadow-md border border-blue-500" x-text="currentUser.initial"></div>
@@ -331,7 +376,7 @@
                                 <textarea x-model="userProfile.address" rows="2" placeholder="Masukkan alamat lengkap..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200 focus:outline-blue-500"></textarea>
                             </div>
                             <button @click="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition shadow-md mt-2">
-                                Simpan ke Cloud Firestore 💾
+                                Simpan Perubahan Profil
                             </button>
                         </div>
                     </div>
@@ -352,9 +397,11 @@
                     <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md"><i class="fa-solid fa-plus text-xs"></i></div>
                     <span>Pengajuan</span>
                 </button>
-                <button @click="showPopup('Inbox HR', 'Anda memiliki 39 pesan masuk belum dibaca.')" class="flex flex-col items-center gap-1 py-1 px-3 transition relative hover:text-slate-200">
+                <button @click="activeTab = 'inbox'" :class="activeTab === 'inbox' ? 'text-blue-400 font-bold' : 'hover:text-slate-200'" class="flex flex-col items-center gap-1 py-1 px-3 transition relative">
                     <i class="fa-solid fa-bell text-sm"></i> Inbox
-                    <span class="absolute top-0 right-2 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">39</span>
+                    <template x-if="unreadInboxCount > 0">
+                        <span class="absolute top-0 right-2 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center" x-text="unreadInboxCount"></span>
+                    </template>
                 </button>
                 <button @click="activeTab = 'account'" :class="activeTab === 'account' ? 'text-blue-400 font-bold' : 'hover:text-slate-200'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
                     <i class="fa-solid fa-user text-sm"></i> Akun
@@ -460,13 +507,13 @@
 
                         <button @click="activeTab = 'team'; showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-amber-950 text-amber-400 flex items-center justify-center text-lg border border-amber-900"><i class="fa-solid fa-calendar-check"></i></div>
-                            <span class="text-[11px] font-medium text-slate-300">Daftar Kehadiran</span>
+                            <span class="text-[11px] font-medium text-slate-300">Kehadiran</span>
                         </button>
                         <button @click="activeTab = 'payroll'; showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-blue-950 text-blue-400 flex items-center justify-center text-lg border border-blue-900"><i class="fa-solid fa-wallet"></i></div>
                             <span class="text-[11px] font-medium text-slate-300">Slip Gaji</span>
                         </button>
-                        <button @click="showPopup('Kalendar', 'Kalender kerja perusahaan.')" class="flex flex-col items-center gap-1.5 group">
+                        <button @click="showPopup('Kalender', 'Kalender kerja perusahaan.')" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-pink-950 text-pink-400 flex items-center justify-center text-lg border border-pink-900"><i class="fa-solid fa-calendar"></i></div>
                             <span class="text-[11px] font-medium text-slate-300">Kalender</span>
                         </button>
@@ -495,12 +542,12 @@
 
                     <div class="flex gap-2 pt-2">
                         <button @click="showModal = false" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">Batal</button>
-                        <button @click="submitRequest()" class="w-1/2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">Kirim</button>
+                        <button @click="submitRequest()" class="w-1/2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">Kirim Pengajuan</button>
                     </div>
                 </div>
             </div>
 
-            <!-- MODAL POPUP NOTIFIKASI PROFESIONAL -->
+            <!-- MODAL POPUP NOTIFIKASI -->
             <div x-show="showPopupModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
                 <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 text-center border border-slate-800">
                     <div class="w-12 h-12 bg-blue-950 text-blue-400 rounded-full flex items-center justify-center mx-auto text-xl border border-blue-900">
@@ -511,7 +558,7 @@
                         <p class="text-xs text-slate-400" x-text="popupMessage"></p>
                     </div>
                     <button @click="showPopupModal = false" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
-                        Mengerti / Tutup
+                        Tutup
                     </button>
                 </div>
             </div>
@@ -520,7 +567,7 @@
 
     </div>
 
-    <!-- Script Logika Ultimate Enterprise dengan Efek Mirror -->
+    <!-- Script Logika Ultimate Enterprise -->
     <script>
         function ultimateEnterpriseApp() {
             return {
@@ -533,8 +580,6 @@
                 activeTab: 'home',
                 currentUserId: '',
                 currentUser: { name: 'Deden Fajar Riyanto', role: 'Staff Operasional', initial: 'DF', email: '', type: 'employee' },
-                currentDate: 'Minggu, 4 Okt 2026',
-                locationStatus: 'Kantor Pusat • Cloud Synced',
                 
                 isClockedIn: false,
                 isClockedOut: false,
@@ -565,6 +610,19 @@
 
                 leaveRequests: [],
                 attendanceHistory: [],
+                inboxMessages: [
+                    { id: 1, title: 'Kebijakan Kehadiran Baru', message: 'Harap melakukan absensi tepat waktu sesuai jadwal shift yang ditentukan.', time: '09:00', read: false },
+                    { id: 2, title: 'Slip Gaji September 2026', message: 'Slip gaji periode bulan September telah diterbitkan di menu Slip Gaji.', time: 'Kemarin', read: false },
+                    { id: 3, title: 'Jadwal Pemeliharaan Sistem', message: 'Pembaruan server cloud akan dilakukan pada akhir pekan mendatang.', time: '2 Okt', read: true }
+                ],
+
+                get unreadInboxCount() {
+                    return this.inboxMessages.filter(m => !m.read).length;
+                },
+
+                markAllInboxRead() {
+                    this.inboxMessages.forEach(m => m.read = true);
+                },
 
                 initAuthListener() {
                     const checkInterval = setInterval(() => {
@@ -619,7 +677,7 @@
                         this.isLoggedIn = true;
                         this.activeTab = 'home';
                         
-                        this.fetchUserRequests(uid);
+                        this.fetchAllRequests();
                         this.fetchAttendanceHistory(uid);
                     } catch (error) {
                         console.error("Gagal mengambil data user:", error);
@@ -654,7 +712,7 @@
                                 address: 'Jakarta'
                             });
 
-                            this.showPopup('Registrasi Berhasil', 'Akun berhasil didaftarkan! Masuk otomatis...');
+                            this.showPopup('Registrasi Berhasil', 'Akun berhasil didaftarkan. Masuk otomatis.');
                         } else {
                             try {
                                 await window.fb.signInWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
@@ -671,7 +729,7 @@
                                         phone: '081234567890',
                                         address: 'Jakarta'
                                     });
-                                    this.showPopup('Akun Dibuat Otomatis', 'Akun baru terdeteksi dan berhasil masuk ke sistem!');
+                                    this.showPopup('Akun Dibuat Otomatis', 'Akun baru terdeteksi dan berhasil masuk.');
                                 } else {
                                     throw signInErr;
                                 }
@@ -724,7 +782,7 @@
                             if (videoElement) videoElement.srcObject = this.mediaStream;
                         }, 200);
                     } catch (err) {
-                        console.warn("Kamera tidak dapat diakses, menggunakan mode simulasi.");
+                        console.warn("Kamera tidak dapat diakses.");
                     }
                 },
 
@@ -757,7 +815,7 @@
                             });
                         } catch(e) {}
 
-                        this.showPopup('Clock In Berhasil', '⚡ Foto wajah terverifikasi & absensi masuk tercatat.');
+                        this.showPopup('Clock In Berhasil', 'Absensi masuk berhasil terekam ke sistem.');
                     } else {
                         this.clockOutTime = timeNow + ' WIB';
                         this.isClockedOut = true;
@@ -775,7 +833,7 @@
                             });
                         } catch(e) {}
 
-                        this.showPopup('Clock Out Berhasil', '✅ Rekap jam kerja harian berhasil disimpan.');
+                        this.showPopup('Clock Out Berhasil', 'Rekap jam kerja harian berhasil disimpan.');
                     }
 
                     this.closeCamera();
@@ -796,7 +854,7 @@
                             phone: this.userProfile.phone,
                             address: this.userProfile.address
                         });
-                        this.showPopup('Penyimpanan Berhasil', '✅ Data diri dan kontak berhasil diperbarui di Cloud Firestore.');
+                        this.showPopup('Penyimpanan Berhasil', 'Data diri dan kontak berhasil diperbarui.');
                     } catch (error) {
                         this.showPopup('Gagal Menyimpan', error.message);
                     }
@@ -818,25 +876,45 @@
                             createdAt: new Date().toISOString()
                         });
                         this.showModal = false;
-                        this.showPopup('Pengajuan Terkirim', '🎉 Permohonan Anda berhasil dikirim ke sistem HR.');
-                        this.fetchUserRequests(this.currentUserId);
+                        this.showPopup('Pengajuan Terkirim', 'Permohonan Anda berhasil dikirim ke sistem HR.');
+                        this.fetchAllRequests();
                     } catch (error) {
                         this.showPopup('Gagal Mengirim', error.message);
                     }
                 },
 
-                async fetchUserRequests(uid) {
+                async fetchAllRequests() {
                     try {
                         const querySnapshot = await window.fb.getDocs(window.fb.collection(window.fb.db, "requests"));
                         this.leaveRequests = [];
                         querySnapshot.forEach((docSnap) => {
                             const data = docSnap.data();
-                            if(data.userId === uid) {
+                            if (this.currentUser.type === 'admin' || data.userId === this.currentUserId) {
                                 this.leaveRequests.push({ id: docSnap.id, ...data });
                             }
                         });
                     } catch (error) {
                         console.error("Gagal memuat request:", error);
+                    }
+                },
+
+                async approveRequest(id) {
+                    try {
+                        await window.fb.updateDoc(window.fb.doc(window.fb.db, "requests", id), { status: 'Disetujui' });
+                        this.showPopup('Persetujuan HR', 'Pengajuan berhasil disetujui.');
+                        this.fetchAllRequests();
+                    } catch(e) {
+                        this.showPopup('Gagal', e.message);
+                    }
+                },
+
+                async rejectRequest(id) {
+                    try {
+                        await window.fb.updateDoc(window.fb.doc(window.fb.db, "requests", id), { status: 'Ditolak' });
+                        this.showPopup('Persetujuan HR', 'Pengajuan telah ditolak.');
+                        this.fetchAllRequests();
+                    } catch(e) {
+                        this.showPopup('Gagal', e.message);
                     }
                 },
 
