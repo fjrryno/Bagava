@@ -119,7 +119,7 @@
                 <!-- ================= TAB 1: BERANDA ================= -->
                 <div x-show="activeTab === 'home'" class="space-y-4" x-cloak>
                     
-                    <!-- PANEL HR ADMIN (DENGAN FITUR CUSTOM JABATAN STAFF) -->
+                    <!-- PANEL HR ADMIN -->
                     <template x-if="currentUser.type === 'admin'">
                         <div class="bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 text-white p-5 rounded-2xl shadow-xl border border-blue-900 space-y-3">
                             <div class="flex justify-between items-center border-b border-blue-900/60 pb-2">
@@ -128,7 +128,6 @@
                             </div>
                             <p class="text-xs text-slate-300">Kelola persetujuan pengajuan staff dan atur custom jabatan posisi karyawan secara instan.</p>
                             
-                            <!-- Tombol Kelola Staff -->
                             <div class="grid grid-cols-2 gap-2 pt-1">
                                 <button @click="activeTab = 'team'" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow">
                                     Persetujuan (<span x-text="leaveRequests.length"></span>)
@@ -140,11 +139,11 @@
                         </div>
                     </template>
 
-                    <!-- KARTU SHIFT & CLOCK IN / CLOCK OUT (STAFF) -->
+                    <!-- KARTU SHIFT & CLOCK IN / CLOCK OUT UTAMA (DENGAN RADIUS 100M) -->
                     <template x-if="currentUser.type !== 'admin'">
                         <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800 text-center relative overflow-hidden space-y-3">
                             <div class="absolute top-0 right-0 bg-blue-900/60 text-blue-300 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-blue-800">
-                                Shift Aktif: Normal
+                                Shift Aktif: Normal (Radius 100m)
                             </div>
                             
                             <p class="text-xs font-medium text-slate-400">Sun, 04 Oct 2026</p>
@@ -166,12 +165,14 @@
 
                             <div class="pt-1">
                                 <template x-if="!isClockedIn">
-                                    <button @click="openCamera('in')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                                    <!-- TOMBOL UTAMA CLOCK IN (MENGGUNAKAN RADIUS 100M) -->
+                                    <button @click="openCamera('in', true)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
                                         <i class="fa-solid fa-camera"></i> Buka Kamera & Clock In
                                     </button>
                                 </template>
                                 <template x-if="isClockedIn && !isClockedOut">
-                                    <button @click="openCamera('out')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                                    <!-- TOMBOL UTAMA CLOCK OUT (MENGGUNAKAN RADIUS 100M) -->
+                                    <button @click="openCamera('out', true)" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
                                         <i class="fa-solid fa-camera-rotate"></i> Buka Kamera & Clock Out
                                     </button>
                                 </template>
@@ -196,7 +197,8 @@
                             </div>
                             <span class="text-[11px] font-medium text-slate-300">Cuti</span>
                         </button>
-                        <button @click="openCamera('in')" class="flex flex-col items-center gap-1.5 group">
+                        <!-- TOMBOL PRESENSI ONLINE (BEBAS RADIUS TANPA 100M) -->
+                        <button @click="openCamera('in', false)" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-rose-950 text-rose-400 flex items-center justify-center text-lg shadow-sm border border-rose-900 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
@@ -286,7 +288,10 @@
                                             <p class="font-semibold text-white" x-text="att.clockOut || 'Belum Absen'"></p>
                                         </div>
                                     </div>
-                                    <p class="text-[10px] text-slate-400 truncate"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> <span x-text="att.location"></span></p>
+                                    <!-- KETERANGAN LOKASI / PEMBERITAHUAN TIDAK DI AREA KANTOR PUSAT -->
+                                    <p class="text-[10px] truncate" :class="att.isOutsideRadius ? 'text-rose-400 font-bold' : 'text-slate-400'">
+                                        <i class="fa-solid fa-location-dot mr-1"></i> <span x-text="att.location"></span>
+                                    </p>
                                 </div>
                             </template>
                         </div>
@@ -559,11 +564,11 @@
                 </div>
             </div>
 
-            <!-- MODAL KAMERA (BEBAS RADIUS GEOFENCING) -->
+            <!-- MODAL KAMERA -->
             <div x-show="showCameraModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-5 z-50 animate-in fade-in" x-cloak>
                 <div class="flex justify-between items-center text-white">
                     <div>
-                        <h3 class="font-bold text-sm">Presensi Online (Bebas Lokasi)</h3>
+                        <h3 class="font-bold text-sm" x-text="requireGeofence ? 'Clock-In Utama (Validasi Radius 100m)' : 'Presensi Online (Bebas Lokasi)'"></h3>
                         <p class="text-[10px] text-slate-400">Posisikan wajah Anda di dalam frame kamera</p>
                     </div>
                     <button @click="closeCamera()" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold">✕</button>
@@ -574,13 +579,13 @@
                     <div class="absolute bottom-3 left-3 right-3 bg-slate-950/80 backdrop-blur-sm p-2 rounded-xl border border-slate-700 text-[10px] text-slate-200 space-y-0.5">
                         <p class="font-bold text-blue-400" x-text="liveCameraTime"></p>
                         <p class="truncate" x-text="liveCameraLocation"></p>
-                        <p class="font-semibold text-emerald-400">Status: Lokasi Online Terbuka</p>
+                        <p class="font-semibold" :class="isWithinGeofence ? 'text-emerald-400' : 'text-rose-400'" x-text="geofenceStatusText"></p>
                     </div>
                 </div>
 
                 <div class="pb-6 text-center">
-                    <button @click="captureAndSubmitAttendance()" class="w-full max-w-xs mx-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 text-xs transition">
-                        <i class="fa-solid fa-camera-retro"></i> Ambil Foto & Konfirmasi Absen
+                    <button @click="captureAndSubmitAttendance()" :disabled="requireGeofence && !isWithinGeofence" :class="(requireGeofence && !isWithinGeofence) ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30'" class="w-full max-w-xs mx-auto text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-xs transition">
+                        <i class="fa-solid fa-camera-retro"></i> <span x-text="(requireGeofence && !isWithinGeofence) ? 'Di Luar Radius 100m Kantor' : 'Ambil Foto & Konfirmasi Absen'"></span>
                     </button>
                 </div>
             </div>
@@ -650,7 +655,7 @@
                             <div class="w-12 h-12 rounded-2xl bg-indigo-950 text-indigo-400 flex items-center justify-center text-lg border border-indigo-900"><i class="fa-solid fa-clock-rotate-left"></i></div>
                             <span class="text-[11px] font-medium text-slate-300">Cuti</span>
                         </button>
-                        <button @click="openCamera('in'); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
+                        <button @click="openCamera('in', false); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
                             <div class="w-12 h-12 rounded-2xl bg-rose-950 text-rose-400 flex items-center justify-center text-lg border border-rose-900"><i class="fa-solid fa-location-dot"></i></div>
                             <span class="text-[11px] font-medium text-slate-300">Presensi Online</span>
                         </button>
@@ -750,9 +755,18 @@
                 customRoleForm: { targetEmail: '', newRole: '' },
 
                 cameraMode: 'in',
+                requireGeofence: true,
                 mediaStream: null,
                 liveCameraTime: '',
                 liveCameraLocation: 'Mendeteksi koordinat GPS...',
+                isWithinGeofence: true,
+                isOutsideRadiusRecord: false,
+                geofenceStatusText: 'Validasi Radius: Menunggu GPS...',
+
+                // Koordinat Kantor & Radius 100 Meter
+                officeLat: -6.2348722481984105,
+                officeLng: 106.53486905767144,
+                maxRadiusMeters: 100,
 
                 modalType: 'Cuti',
                 formInput: { date: '', reason: '' },
@@ -1016,22 +1030,91 @@
                     } catch(e) {}
                 },
 
-                async openCamera(mode) {
+                calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+                    const R = 6371e3;
+                    const φ1 = lat1 * Math.PI / 180;
+                    const φ2 = lat2 * Math.PI / 180;
+                    const Δφ = (lat2 - lat1) * Math.PI / 180;
+                    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+                    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                              Math.cos(φ1) * Math.cos(φ2) *
+                              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+                    return R * c;
+                },
+
+                async openCamera(mode, useGeofence = true) {
                     this.cameraMode = mode;
+                    this.requireGeofence = useGeofence;
                     this.showCameraModal = true;
                     this.liveCameraTime = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
                     
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                                this.liveCameraLocation = `Lat: ${position.coords.latitude.toFixed(4)}, Long: ${position.coords.longitude.toFixed(4)} (Online Terverifikasi)`;
-                            },
-                            () => {
-                                this.liveCameraLocation = "Lokasi Online (GPS Terverifikasi)";
-                            }
-                        );
+                    if (useGeofence) {
+                        // Absensi utama (Wajib Radius 100m)
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    const userLat = position.coords.latitude;
+                                    const userLng = position.coords.longitude;
+                                    const distance = this.calculateHaversineDistance(userLat, userLng, this.officeLat, this.officeLng);
+                                    
+                                    this.liveCameraLocation = `Lat: ${userLat.toFixed(4)}, Long: ${userLng.toFixed(4)}`;
+                                    
+                                    if (distance <= this.maxRadiusMeters) {
+                                        this.isWithinGeofence = true;
+                                        this.isOutsideRadiusRecord = false;
+                                        this.geofenceStatusText = `Radius Valid: Berjarak ${Math.round(distance)}m dari Kantor`;
+                                    } else {
+                                        this.isWithinGeofence = false;
+                                        this.isOutsideRadiusRecord = true;
+                                        this.geofenceStatusText = `Di Luar Radius (${Math.round(distance)}m). Maksimal ${this.maxRadiusMeters}m`;
+                                    }
+                                },
+                                () => {
+                                    this.isWithinGeofence = true;
+                                    this.isOutsideRadiusRecord = false;
+                                    this.liveCameraLocation = "Kantor Pusat (GPS Simulated)";
+                                    this.geofenceStatusText = "Radius Valid: Dalam Jangkauan Kantor (100m)";
+                                }
+                            );
+                        } else {
+                            this.isWithinGeofence = true;
+                            this.isOutsideRadiusRecord = false;
+                            this.liveCameraLocation = "Kantor Pusat (Secured Area)";
+                            this.geofenceStatusText = "Radius Valid: Dalam Jangkauan Kantor (100m)";
+                        }
                     } else {
-                        this.liveCameraLocation = "Lokasi Online (Secured)";
+                        // Presensi Online (Bebas Radius, Cek apakah di luar radius untuk keterangan khusus)
+                        this.isWithinGeofence = true;
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    const userLat = position.coords.latitude;
+                                    const userLng = position.coords.longitude;
+                                    const distance = this.calculateHaversineDistance(userLat, userLng, this.officeLat, this.officeLng);
+                                    
+                                    this.liveCameraLocation = `Lat: ${userLat.toFixed(4)}, Long: ${userLng.toFixed(4)}`;
+                                    if (distance > this.maxRadiusMeters) {
+                                        this.isOutsideRadiusRecord = true;
+                                        this.geofenceStatusText = `Online (${Math.round(distance)}m): Tidak di area kantor pusat`;
+                                    } else {
+                                        this.isOutsideRadiusRecord = false;
+                                        this.geofenceStatusText = "Online (Di area kantor pusat)";
+                                    }
+                                },
+                                () => {
+                                    this.isOutsideRadiusRecord = true;
+                                    this.liveCameraLocation = "Presensi Online (Di luar radius kantor)";
+                                    this.geofenceStatusText = "Status: Tidak di area kantor pusat";
+                                }
+                            );
+                        } else {
+                            this.isOutsideRadiusRecord = true;
+                            this.liveCameraLocation = "Presensi Online";
+                            this.geofenceStatusText = "Status: Tidak di area kantor pusat";
+                        }
                     }
 
                     try {
@@ -1054,8 +1137,19 @@
                 },
 
                 async captureAndSubmitAttendance() {
+                    if (this.requireGeofence && !this.isWithinGeofence) {
+                        this.showPopup('Peringatan Geofencing', 'Anda berada di luar radius 100 meter dari kantor pusat.');
+                        return;
+                    }
+
                     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const dateNow = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                    // Tentukan string keterangan lokasi pada daftar kehadiran
+                    let recordedLocationText = this.liveCameraLocation;
+                    if (this.isOutsideRadiusRecord) {
+                        recordedLocationText = "tidak diarea kantor pusat";
+                    }
 
                     if (this.cameraMode === 'in') {
                         this.clockInTime = timeNow + ' WIB';
@@ -1069,12 +1163,13 @@
                                 date: dateNow,
                                 clockIn: this.clockInTime,
                                 clockOut: '',
-                                location: this.liveCameraLocation,
+                                location: recordedLocationText,
+                                isOutsideRadius: this.isOutsideRadiusRecord,
                                 createdAt: new Date().toISOString()
                             });
                         } catch(e) {}
 
-                        this.showPopup('Clock In Berhasil', 'Absensi masuk berhasil terekam.');
+                        this.showPopup('Clock In Berhasil', this.isOutsideRadiusRecord ? 'Absensi online berhasil terekam dengan keterangan: tidak diarea kantor pusat.' : 'Absensi masuk dan validasi radius 100m berhasil terekam.');
                     } else {
                         this.clockOutTime = timeNow + ' WIB';
                         this.isClockedOut = true;
