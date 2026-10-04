@@ -433,7 +433,7 @@
                 </button>
             </nav>
 
-            <!-- MODAL DINAMIS MENU AKUN (INTERACTIVE ACCOUNT FORMS) -->
+            <!-- MODAL DINAMIS MENU AKUN -->
             <div x-show="showAccountModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
                 <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-800 text-xs">
                     <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -461,7 +461,7 @@
                         <div class="space-y-2 text-slate-300">
                             <p><strong>Jabatan:</strong> <span class="text-white" x-text="currentUser.role"></span></p>
                             <p><strong>Departemen:</strong> Operasional & Customer Relationship Management</p>
-                            <p><strong>Lokasi Kerja:</strong> Kantor Pusat (Jakarta Selatan)</p>
+                            <p><strong>Lokasi Kerja:</strong> Kantor Pusat (Koordinat Terdaftar)</p>
                             <p><strong>Status Pegawai:</strong> Karyawan Tetap (Full-Time)</p>
                         </div>
                     </template>
@@ -741,9 +741,10 @@
                 isWithinGeofence: true,
                 geofenceStatusText: 'Validasi Radius: Dalam Jangkauan Kantor (0m)',
 
-                officeLat: -6.2293,
-                officeLng: 106.8167,
-                maxRadiusMeters: 200,
+                // Koordinat Kantor Baru yang Diatur
+                officeLat: -6.2348722481984105,
+                officeLng: 106.53486905767144,
+                maxRadiusMeters: 100,
 
                 modalType: 'Cuti',
                 formInput: { date: '', reason: '' },
@@ -1007,7 +1008,7 @@
                                 
                                 if (distance <= this.maxRadiusMeters) {
                                     this.isWithinGeofence = true;
-                                    this.geofenceStatusText = `Radius Valid: Berjarak ${Math.round(distance)}m dari Kantor Pusat`;
+                                    this.geofenceStatusText = `Radius Valid: Berjarak ${Math.round(distance)}m dari Kantor`;
                                 } else {
                                     this.isWithinGeofence = false;
                                     this.geofenceStatusText = `Di Luar Radius (${Math.round(distance)}m). Maksimal ${this.maxRadiusMeters}m`;
