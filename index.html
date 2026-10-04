@@ -3,55 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumen Workforce - Aplikasi Absensi & HRIS</title>
-    <!-- Tailwind CSS untuk Desain Modern -->
+    <title>TalentaLite - HRIS & Attendance System</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js untuk Logika Interaktif Ringan -->
+    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased" x-data="appData()">
+<body class="bg-slate-50 font-sans antialiased text-slate-800" x-data="talentaApp()">
 
-    <!-- App Container -->
-    <div class="max-w-md mx-auto min-h-screen bg-white shadow-xl flex flex-col justify-between relative overflow-hidden">
+    <!-- App Container (Desain Responsif Mobile/Desktop Wrapper) -->
+    <div class="max-w-md mx-auto min-h-screen bg-white shadow-2xl flex flex-col justify-between relative overflow-hidden border-x border-slate-100">
         
         <!-- ================= HALAMAN LOGIN ================= -->
         <template x-if="!isLoggedIn">
-            <div class="p-6 flex-1 flex flex-col justify-center space-y-6 bg-gradient-to-br from-indigo-900 to-indigo-700 text-white">
+            <div class="p-6 flex-1 flex flex-col justify-center space-y-6 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
                 <div class="text-center space-y-2">
-                    <div class="w-16 h-16 bg-white/10 rounded-2xl mx-auto flex items-center justify-center backdrop-blur-md text-2xl font-bold">
-                        🏢
+                    <div class="w-16 h-16 bg-white/10 rounded-2xl mx-auto flex items-center justify-center backdrop-blur-md text-2xl font-bold border border-white/20">
+                        ⚡
                     </div>
-                    <h1 class="text-2xl font-bold tracking-tight">Lumen Workforce</h1>
-                    <p class="text-xs text-indigo-200">Sistem Absensi Digital & HRIS Terpadu</p>
+                    <h1 class="text-2xl font-extrabold tracking-tight">TalentaLite HR</h1>
+                    <p class="text-xs text-blue-200">Powered by Mekari Style Architecture</p>
                 </div>
 
-                <div class="bg-white text-gray-800 p-6 rounded-3xl shadow-2xl space-y-4">
-                    <h2 class="text-sm font-bold text-gray-700 text-center">Silakan Masuk ke Akun Anda</h2>
+                <div class="bg-white text-slate-800 p-6 rounded-3xl shadow-2xl space-y-4">
+                    <h2 class="text-sm font-bold text-slate-700 text-center">Masuk ke Portal Karyawan & HR</h2>
                     
                     <div class="space-y-3 text-xs">
                         <div>
-                            <label class="block text-gray-500 mb-1 font-medium">Pilih Peran / Akun</label>
-                            <select x-model="selectedRole" class="w-full border border-gray-200 p-3 rounded-xl focus:outline-indigo-500 bg-gray-50 font-medium">
-                                <option value="employee">Karyawan (Budi Santoso)</option>
-                                <option value="admin">Admin HR (Sarah Manager)</option>
+                            <label class="block text-slate-500 mb-1 font-medium">Pilih Akses Akun</label>
+                            <select x-model="selectedRole" class="w-full border border-slate-200 p-3 rounded-xl focus:outline-blue-600 bg-slate-50 font-medium">
+                                <option value="employee">Karyawan (Budi Santoso - Operasional)</option>
+                                <option value="admin">HR Admin (Sarah - HR Manager)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-gray-500 mb-1 font-medium">Kata Sandi (Demo)</label>
-                            <input type="password" value="123456" disabled class="w-full border border-gray-200 p-3 rounded-xl bg-gray-100 text-gray-400">
+                            <label class="block text-slate-500 mb-1 font-medium">Kata Sandi Perusahaan</label>
+                            <input type="password" value="••••••••" disabled class="w-full border border-slate-200 p-3 rounded-xl bg-slate-100 text-slate-400">
                         </div>
                     </div>
 
-                    <button @click="login()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition text-sm">
-                        Masuk ke Aplikasi 🚀
+                    <button @click="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition text-sm">
+                        Masuk ke Dashboard 🚀
                     </button>
 
                     <div class="text-center pt-2">
-                        <p class="text-[11px] text-gray-400">Kantor Pusat - Operasional & Manajemen</p>
+                        <p class="text-[11px] text-slate-400">Sistem Kehadiran & Payroll Terpadu</p>
                     </div>
                 </div>
             </div>
@@ -59,144 +59,159 @@
 
         <!-- ================= HALAMAN UTAMA APLIKASI ================= -->
         <template x-if="isLoggedIn">
-            <div class="flex flex-col flex-1 justify-between">
+            <div class="flex flex-col flex-1 justify-between bg-slate-50">
                 
-                <!-- HEADER -->
-                <header class="bg-indigo-600 text-white p-5 rounded-b-3xl shadow-md">
+                <!-- HEADER TALENTA STYLE -->
+                <header class="bg-blue-600 text-white p-5 rounded-b-[2rem] shadow-lg">
                     <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-xs text-indigo-200 uppercase tracking-wider font-semibold">Lumen Workforce</p>
-                            <h1 class="text-xl font-bold mt-0.5" x-text="currentUser.name"></h1>
-                            <span class="inline-block bg-indigo-500 text-indigo-100 text-xs px-2 py-0.5 rounded-full mt-1" x-text="currentUser.role"></span>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm border border-white/30" x-text="currentUser.initial"></div>
+                            <div>
+                                <h1 class="text-base font-bold" x-text="currentUser.name"></h1>
+                                <p class="text-[11px] text-blue-100" x-text="currentUser.role"></p>
+                            </div>
                         </div>
-                        <button @click="logout()" class="bg-indigo-700 hover:bg-indigo-800 text-xs px-3 py-2 rounded-xl transition font-medium border border-indigo-500">
+                        <button @click="logout()" class="bg-blue-700 hover:bg-blue-800 text-xs px-3 py-2 rounded-xl transition font-medium border border-blue-500">
                             Keluar 🚪
                         </button>
                     </div>
-                    <div class="mt-4 flex items-center justify-between text-xs bg-indigo-700/50 p-2.5 rounded-xl backdrop-blur-sm">
+                    <!-- Company Location & Date Info Bar -->
+                    <div class="mt-4 flex items-center justify-between text-xs bg-blue-700/60 p-2.5 rounded-xl backdrop-blur-md border border-blue-500/30">
                         <span>📍 <span x-text="locationStatus"></span></span>
                         <span>📅 <span x-text="currentDate"></span></span>
                     </div>
                 </header>
 
                 <!-- KONTEN UTAMA BERDASARKAN ROLE -->
-                <main class="p-5 flex-1 overflow-y-auto pb-20">
+                <main class="p-5 flex-1 overflow-y-auto pb-24 space-y-4">
 
-                    <!-- VIEW KARYAWAN -->
-                    <div x-show="currentUser.type === 'employee'" class="space-y-5">
+                    <!-- ================= VIEW KARYAWAN (SELF SERVICE) ================= -->
+                    <div x-show="currentUser.type === 'employee'" class="space-y-4">
                         
-                        <!-- Status Kehadiran Card -->
-                        <div class="bg-gradient-to-br from-gray-50 to-indigo-50/30 border border-indigo-100 p-5 rounded-2xl shadow-sm text-center">
-                            <p class="text-xs text-gray-500 font-medium">STATUS KEHADIRAN HARI INI</p>
+                        <!-- Attendance Live Card -->
+                        <div class="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm text-center relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-blue-50 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-bl-xl">
+                                Shift: Reguler (08:00 - 17:00)
+                            </div>
+                            
+                            <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase mt-1">Status Kehadiran Hari Ini</p>
                             
                             <div class="my-3">
-                                <span class="text-2xl font-bold" :class="isClockedIn ? 'text-emerald-600' : 'text-amber-600'" x-text="attendanceStatus"></span>
+                                <span class="text-xl font-extrabold" :class="isClockedIn ? 'text-emerald-600' : 'text-amber-600'" x-text="attendanceStatus"></span>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-4 bg-white p-3 rounded-xl border border-gray-100 shadow-inner">
+                            <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <div>
-                                    <p class="text-gray-400">Clock-In</p>
-                                    <p class="font-bold text-gray-800 text-sm" x-text="clockInTime || '--:--'"></p>
+                                    <p class="text-slate-400">Clock-In</p>
+                                    <p class="font-bold text-slate-800 text-sm" x-text="clockInTime || '--:--'"></p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-400">Clock-Out</p>
-                                    <p class="font-bold text-gray-800 text-sm" x-text="clockOutTime || '--:--'"></p>
+                                    <p class="text-slate-400">Clock-Out</p>
+                                    <p class="font-bold text-slate-800 text-sm" x-text="clockOutTime || '--:--'"></p>
                                 </div>
                             </div>
 
                             <!-- Tombol Aksi Absen -->
                             <template x-if="!isClockedIn">
-                                <button @click="clockIn()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-camera"></i> Ambil Foto & Clock-In
+                                <button @click="clockIn()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2 text-xs">
+                                    <i class="fa-solid fa-camera"></i> Clock-In Masuk (GPS & Selfie)
                                 </button>
                             </template>
                             <template x-if="isClockedIn && !isClockedOut">
-                                <button @click="clockOut()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-rose-600/20 transition flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-person-walking-arrow-right"></i> Clock-Out Pulang
+                                <button @click="clockOut()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-rose-600/20 transition flex items-center justify-center gap-2 text-xs">
+                                    <i class="fa-solid fa-person-walking-arrow-right"></i> Clock-Out Pulang Kantor
                                 </button>
                             </template>
                             <template x-if="isClockedIn && isClockedOut">
-                                <p class="text-xs text-indigo-600 font-semibold bg-indigo-50 py-2 rounded-lg">✨ Absensi hari ini telah selesai.</p>
+                                <p class="text-xs text-blue-600 font-semibold bg-blue-50 py-2 rounded-lg">✨ Kehadiran hari ini telah terekam lengkap.</p>
                             </template>
                         </div>
 
-                        <!-- Pintasan Menu Layanan Mandiri -->
+                        <!-- Menu Layanan Mandiri (Time Off / Cuti & Overtime) -->
                         <div>
-                            <h3 class="text-sm font-bold text-gray-800 mb-3">Layanan HR Mandiri</h3>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button @click="openModal('cuti')" class="p-3.5 bg-white border border-gray-200 hover:border-indigo-500 rounded-2xl text-left shadow-sm transition group">
-                                    <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:bg-indigo-600 group-hover:text-white transition">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Time Off & Pengajuan HR</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button @click="openModal('cuti')" class="p-3 bg-white border border-slate-200 hover:border-blue-500 rounded-xl text-center shadow-sm transition group">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-1.5 group-hover:bg-blue-600 group-hover:text-white transition text-sm">
                                         <i class="fa-solid fa-calendar-days"></i>
                                     </div>
-                                    <p class="font-bold text-xs text-gray-800">Ajukan Cuti</p>
-                                    <p class="text-[10px] text-gray-400">Sisa kuota: 10 hari</p>
+                                    <p class="font-bold text-xs text-slate-700">Cuti</p>
+                                    <p class="text-[9px] text-slate-400">Sisa: 10 Hari</p>
                                 </button>
-                                <button @click="openModal('sakit')" class="p-3.5 bg-white border border-gray-200 hover:border-indigo-500 rounded-2xl text-left shadow-sm transition group">
-                                    <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2 group-hover:bg-rose-600 group-hover:text-white transition">
+                                <button @click="openModal('sakit')" class="p-3 bg-white border border-slate-200 hover:border-blue-500 rounded-xl text-center shadow-sm transition group">
+                                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-1.5 group-hover:bg-rose-600 group-hover:text-white transition text-sm">
                                         <i class="fa-solid fa-notes-medical"></i>
                                     </div>
-                                    <p class="font-bold text-xs text-gray-800">Izin Sakit</p>
-                                    <p class="text-[10px] text-gray-400">Lampirkan surat dokter</p>
+                                    <p class="font-bold text-xs text-slate-700">Sakit</p>
+                                    <p class="text-[9px] text-slate-400">Lampirkan SK</p>
+                                </button>
+                                <button @click="openModal('lembur')" class="p-3 bg-white border border-slate-200 hover:border-blue-500 rounded-xl text-center shadow-sm transition group">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-1.5 group-hover:bg-amber-600 group-hover:text-white transition text-sm">
+                                        <i class="fa-solid fa-business-time"></i>
+                                    </div>
+                                    <p class="font-bold text-xs text-slate-700">Lembur</p>
+                                    <p class="text-[9px] text-slate-400">Overtime</p>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Pengumuman Perusahaan -->
-                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl">
-                            <div class="flex items-start gap-3">
-                                <span class="text-amber-600 text-lg">📌</span>
-                                <div>
-                                    <h4 class="text-xs font-bold text-amber-900">Pengumuman Kegiatan HR</h4>
-                                    <p class="text-xs text-amber-700 mt-0.5">Rapat Koordinasi Bulanan Divisi Operasional akan diadakan Jumat ini pukul 14.00 WIB di Ruang Rapat Utama.</p>
-                                </div>
+                        <!-- Company Announcement & HR Activities -->
+                        <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Pengumuman & Kegiatan HR</h4>
+                                <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">Resmi</span>
+                            </div>
+                            <div class="border-l-2 border-blue-600 pl-3 py-1 space-y-0.5">
+                                <p class="text-xs font-bold text-slate-800">Town Hall Meeting Bulanan</p>
+                                <p class="text-[11px] text-slate-500">Jumat, 9 Oktober 2026 pukul 14.00 WIB via Live Broadcast.</p>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- VIEW ADMIN / HR -->
+                    <!-- ================= VIEW ADMIN / HR DASHBOARD ================= -->
                     <div x-show="currentUser.type === 'admin'" class="space-y-4">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-gray-800">Dashboard Monitoring HR</h3>
-                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-medium">Live System</span>
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">HR Analytics & Approval</h3>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">Live Monitoring</span>
                         </div>
 
-                        <!-- Kartu Statistik -->
+                        <!-- Kartu Statistik Kehadiran Perusahaan -->
                         <div class="grid grid-cols-3 gap-2 text-center">
-                            <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
-                                <p class="text-lg font-bold text-indigo-700" x-text="adminStats.hadir">0</p>
-                                <p class="text-[10px] text-indigo-500 font-medium">Hadir</p>
+                            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                                <p class="text-base font-extrabold text-blue-700" x-text="adminStats.hadir">0</p>
+                                <p class="text-[10px] text-blue-500 font-bold">Hadir Hari Ini</p>
                             </div>
                             <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
-                                <p class="text-lg font-bold text-amber-700" x-text="adminStats.izin">0</p>
-                                <p class="text-[10px] text-amber-500 font-medium">Izin/Cuti</p>
+                                <p class="text-base font-extrabold text-amber-700" x-text="adminStats.izin">0</p>
+                                <p class="text-[10px] text-amber-500 font-bold">Cuti / Izin</p>
                             </div>
                             <div class="bg-rose-50 p-3 rounded-xl border border-rose-100">
-                                <p class="text-lg font-bold text-rose-700" x-text="adminStats.alpha">0</p>
-                                <p class="text-[10px] text-rose-500 font-medium">Alpha</p>
+                                <p class="text-base font-extrabold text-rose-700" x-text="adminStats.alpha">0</p>
+                                <p class="text-[10px] text-rose-500 font-bold">Alpha / Mangkir</p>
                             </div>
                         </div>
 
-                        <!-- Daftar Riwayat / Approval Masuk -->
-                        <div>
-                            <h4 class="text-xs font-bold text-gray-700 mb-2">Persetujuan & Riwayat Pengajuan Masuk</h4>
+                        <!-- Daftar Antrean Persetujuan (Approval Center) -->
+                        <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-3">
+                            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Antrean Persetujuan Cuti & Izin</h4>
                             <div class="space-y-2">
                                 <template x-for="req in leaveRequests" :key="req.id">
-                                    <div class="bg-white border border-gray-200 p-3 rounded-xl shadow-sm text-xs flex justify-between items-center">
-                                        <div>
-                                            <p class="font-bold text-gray-800" x-text="req.name"></p>
-                                            <p class="text-gray-500 text-[11px]" x-text="req.type + ' (' + req.date + ')'"></p>
-                                            <p class="text-gray-400 italic text-[10px]" x-text="'Alasan: ' + req.reason"></p>
+                                    <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl text-xs flex justify-between items-center">
+                                        <div class="space-y-0.5">
+                                            <p class="font-bold text-slate-800" x-text="req.name"></p>
+                                            <p class="text-slate-500 text-[11px]" x-text="req.type + ' (' + req.date + ')'"></p>
+                                            <p class="text-slate-400 italic text-[10px]" x-text="'Catatan: ' + req.reason"></p>
                                         </div>
                                         <div>
                                             <template x-if="req.status === 'Pending'">
                                                 <div class="flex gap-1">
-                                                    <button @click="approveReq(req.id)" class="bg-emerald-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold">Setujui</button>
-                                                    <button @click="rejectReq(req.id)" class="bg-rose-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold">Tolak</button>
+                                                    <button @click="approveReq(req.id)" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">Setujui</button>
+                                                    <button @click="rejectReq(req.id)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1.5 rounded-lg text-[10px] font-bold">Tolak</button>
                                                 </div>
                                             </template>
                                             <template x-if="req.status !== 'Pending'">
-                                                <span class="px-2 py-1 rounded-md text-[10px] font-bold" :class="req.status === 'Disetujui' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'" x-text="req.status"></span>
+                                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold" :class="req.status === 'Disetujui' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'" x-text="req.status"></span>
                                             </template>
                                         </div>
                                     </div>
@@ -207,47 +222,50 @@
 
                 </main>
 
-                <!-- BOTTOM NAV BAR -->
-                <nav class="bg-white border-t border-gray-200 p-3 flex justify-around text-center text-xs text-gray-500 absolute bottom-0 w-full max-w-md shadow-lg">
-                    <button class="text-indigo-600 font-bold flex flex-col items-center gap-1">
-                        <i class="fa-solid fa-house text-base"></i> Beranda
+                <!-- TALENTA STYLE BOTTOM NAVIGATION BAR -->
+                <nav class="bg-white border-t border-slate-200 p-3 flex justify-around text-center text-xs text-slate-400 absolute bottom-0 w-full max-w-md shadow-lg">
+                    <button class="text-blue-600 font-bold flex flex-col items-center gap-1">
+                        <i class="fa-solid fa-house text-sm"></i> Beranda
                     </button>
-                    <button @click="alert('Fitur kalender riwayat absensi bulanan.')" class="flex flex-col items-center gap-1 hover:text-indigo-600">
-                        <i class="fa-solid fa-calendar-check text-base"></i> Riwayat
+                    <button @click="alert('Fitur direktori dan profil rekan kerja perusahaan.')" class="flex flex-col items-center gap-1 hover:text-blue-600">
+                        <i class="fa-solid fa-users text-sm"></i> Tim
                     </button>
-                    <button @click="alert('Fitur profil dan pengaturan akun.')" class="flex flex-col items-center gap-1 hover:text-indigo-600">
-                        <i class="fa-solid fa-user text-base"></i> Profil
+                    <button @click="alert('Fitur rekapitulasi gaji & slip gaji digital (Payroll).')" class="flex flex-col items-center gap-1 hover:text-blue-600">
+                        <i class="fa-solid fa-wallet text-sm"></i> Payroll
+                    </button>
+                    <button @click="alert('Fitur pengaturan profil akun mandiri.')" class="flex flex-col items-center gap-1 hover:text-blue-600">
+                        <i class="fa-solid fa-user-gear text-sm"></i> Akun
                     </button>
                 </nav>
 
-                <!-- MODAL FORM PENGAJUAN -->
-                <div x-show="showModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
+                <!-- MODAL FORM PENGAJUAN (CUTI / SAKIT / LEMBUR) -->
+                <div x-show="showModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
                     <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-4">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-sm text-gray-800" x-text="modalType === 'cuti' ? 'Form Pengajuan Cuti' : 'Form Pengajuan Izin Sakit'"></h3>
-                            <button @click="showModal = false" class="text-gray-400 hover:text-gray-600 font-bold">✕</button>
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <h3 class="font-bold text-sm text-slate-800" x-text="'Form Pengajuan ' + modalType.toUpperCase()"></h3>
+                            <button @click="showModal = false" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
                         </div>
                         
                         <div class="space-y-3 text-xs">
                             <div>
-                                <label class="block text-gray-500 mb-1 font-medium">Tanggal Mulai</label>
-                                <input type="date" x-model="formInput.date" class="w-full border border-gray-200 p-2 rounded-xl focus:outline-indigo-500">
+                                <label class="block text-slate-500 mb-1 font-medium">Tanggal Pelaksanaan</label>
+                                <input type="date" x-model="formInput.date" class="w-full border border-slate-200 p-2.5 rounded-xl focus:outline-blue-600 bg-slate-50">
                             </div>
                             <div>
-                                <label class="block text-gray-500 mb-1 font-medium">Alasan / Keterangan</label>
-                                <textarea x-model="formInput.reason" rows="3" placeholder="Tuliskan keterangan secara lengkap..." class="w-full border border-gray-200 p-2 rounded-xl focus:outline-indigo-500"></textarea>
+                                <label class="block text-slate-500 mb-1 font-medium">Keterangan / Alasan</label>
+                                <textarea x-model="formInput.reason" rows="3" placeholder="Tuliskan alasan lengkap..." class="w-full border border-slate-200 p-2.5 rounded-xl focus:outline-blue-600 bg-slate-50"></textarea>
                             </div>
                             <template x-if="modalType === 'sakit'">
                                 <div>
-                                    <label class="block text-gray-500 mb-1 font-medium">Lampiran Surat Dokter (Simulasi)</label>
-                                    <input type="file" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                                    <label class="block text-slate-500 mb-1 font-medium">Unggah Surat Dokter</label>
+                                    <input type="file" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                 </div>
                             </template>
                         </div>
 
                         <div class="flex gap-2 pt-2">
-                            <button @click="showModal = false" class="w-1/2 bg-gray-100 text-gray-600 font-bold py-2.5 rounded-xl text-xs">Batal</button>
-                            <button @click="submitRequest()" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-indigo-600/20">Kirim Pengajuan</button>
+                            <button @click="showModal = false" class="w-1/2 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-xs">Batal</button>
+                            <button @click="submitRequest()" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-blue-600/20">Kirim Pengajuan</button>
                         </div>
                     </div>
                 </div>
@@ -257,41 +275,41 @@
 
     </div>
 
-    <!-- Script Logika Interaktif -->
+    <!-- Script Logika Interaktif Ala Talenta -->
     <script>
-        function appData() {
+        function talentaApp() {
             return {
                 isLoggedIn: false,
                 selectedRole: 'employee',
-                currentUser: { name: '', role: '', type: 'employee' },
+                currentUser: { name: '', role: '', initial: '', type: 'employee' },
                 currentDate: 'Minggu, 4 Okt 2026',
-                locationStatus: 'Dalam Radius Kantor (15m)',
+                locationStatus: 'Kantor Pusat (Radius Valid 10m)',
                 
                 // State Absensi
                 isClockedIn: false,
                 isClockedOut: false,
                 clockInTime: '',
                 clockOutTime: '',
-                attendanceStatus: 'Belum Melakukan Absen',
+                attendanceStatus: 'Belum Melakukan Clock-In',
 
-                // State Modal Pengajuan
+                // State Modal
                 showModal: false,
                 modalType: 'cuti',
                 formInput: { date: '', reason: '' },
 
-                // Data Dummy untuk Admin & Karyawan
-                adminStats: { hadir: 40, izin: 3, alpha: 0 },
+                // Data Dummy HR Admin
+                adminStats: { hadir: 42, izin: 3, alpha: 0 },
                 leaveRequests: [
-                    { id: 1, name: 'Siti Rahma', type: 'Cuti Tahunan', date: '6-8 Okt 2026', reason: 'Urusan keluarga mendadak', status: 'Pending' },
-                    { id: 2, name: 'Andi Pratama', type: 'Izin Sakit', date: '4 Okt 2026', reason: 'Demam tinggi & lampirkan surat dokter', status: 'Pending' }
+                    { id: 1, name: 'Siti Rahma', type: 'Cuti Tahunan', date: '6-8 Okt 2026', reason: 'Urusan keluarga di Bandung', status: 'Pending' },
+                    { id: 2, name: 'Andi Pratama', type: 'Izin Sakit', date: '4 Okt 2026', reason: 'Demam tinggi disertai surat dokter', status: 'Pending' }
                 ],
 
                 login() {
                     this.isLoggedIn = true;
                     if (this.selectedRole === 'employee') {
-                        this.currentUser = { name: 'Budi Santoso', role: 'Karyawan Operasional', type: 'employee' };
+                        this.currentUser = { name: 'Budi Santoso', role: 'Staff Operasional & CRM', initial: 'BS', type: 'employee' };
                     } else {
-                        this.currentUser = { name: 'Sarah Manager', role: 'HR Manager', type: 'admin' };
+                        this.currentUser = { name: 'Sarah Manager', role: 'HR Operation Manager', initial: 'SM', type: 'admin' };
                     }
                 },
 
@@ -304,15 +322,15 @@
                     this.clockInTime = timeNow + ' WIB';
                     this.isClockedIn = true;
                     this.attendanceStatus = 'Hadir (Tepat Waktu)';
-                    alert('📸 Simulasi: Foto Selfie berhasil diambil & Koordinat GPS terverifikasi dalam radius kantor!');
+                    alert('📸 Mekari Talenta Check: Foto Selfie divalidasi & Lokasi GPS kantor terverifikasi!');
                 },
 
                 clockOut() {
                     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     this.clockOutTime = timeNow + ' WIB';
                     this.isClockedOut = true;
-                    this.attendanceStatus = 'Selesai Bekerja Hari Ini';
-                    alert('✅ Berhasil Clock-Out! Jam kerja hari ini telah terekam.');
+                    this.attendanceStatus = 'Selesai Jam Kerja Hari Ini';
+                    alert('✅ Clock-Out berhasil! Jam lembur dan rekap harian otomatis tercatat.');
                 },
 
                 openModal(type) {
@@ -324,22 +342,22 @@
 
                 submitRequest() {
                     if(!this.formInput.date || !this.formInput.reason) {
-                        alert('Mohon isi tanggal dan alasan pengajuan.');
+                        alert('Mohon lengkapi tanggal dan alasan pengajuan.');
                         return;
                     }
                     
                     this.leaveRequests.unshift({
                         id: Date.now(),
                         name: this.currentUser.name,
-                        type: this.modalType === 'cuti' ? 'Cuti Tahunan' : 'Izin Sakit',
-                        date: this.thisFormDate || this.formInput.date,
+                        type: this.modalType === 'cuti' ? 'Cuti Tahunan' : (this.modalType === 'sakit' ? 'Izin Sakit' : 'Lembur Overtime'),
+                        date: this.formInput.date,
                         reason: this.formInput.reason,
                         status: 'Pending'
                     });
 
                     this.adminStats.izin += 1;
                     this.showModal = false;
-                    alert('🎉 Pengajuan berhasil dikirim ke Admin HR!');
+                    alert('🎉 Pengajuan berhasil dikirim melalui Talenta Self-Service!');
                 },
 
                 approveReq(id) {
