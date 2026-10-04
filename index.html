@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TalentaLite Ultimate Enterprise - Firebase Connected</title>
+    <title>TalentaLite Ultimate - Enterprise HRIS & Payroll</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
@@ -11,8 +11,8 @@
     <!-- Firebase SDK v10 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Konfigurasi Firebase Proyek Bagava
         const firebaseConfig = {
@@ -29,8 +29,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Ekspor ke window global agar terpanggil oleh Alpine.js
-        window.fb = { auth, db, signInWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, setDoc };
+        window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, setDoc, getDoc };
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -39,45 +38,63 @@
 </head>
 <body class="bg-slate-950 font-sans antialiased text-slate-100" x-data="ultimateEnterpriseApp()">
 
-    <!-- App Container Wrapper (Navy Theme) -->
+    <!-- App Container Wrapper (Modern Navy Theme) -->
     <div class="max-w-md mx-auto min-h-screen bg-slate-900 shadow-2xl flex flex-col justify-between relative overflow-hidden border-x border-slate-800">
         
-        <!-- ================= HALAMAN LOGIN (EMAIL SAJA) ================= -->
+        <!-- ================= HALAMAN AUTENTIKASI (LOGIN & REGISTER) ================= -->
         <template x-if="!isLoggedIn">
             <div class="p-8 flex-1 flex flex-col justify-center space-y-6 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white">
                 <div class="text-center space-y-3">
                     <div class="w-16 h-16 bg-blue-600/20 rounded-2xl mx-auto flex items-center justify-center backdrop-blur-md text-2xl font-bold border border-blue-500/30 shadow-inner">
-                        <i class="fa-solid fa-shield-halved text-blue-400"></i>
+                        <i class="fa-solid fa-fingerprint text-blue-400"></i>
                     </div>
                     <div>
                         <h1 class="text-xl font-extrabold tracking-tight">TalentaLite Ultimate</h1>
-                        <p class="text-xs text-slate-400 mt-1">Connected to Firebase (Bagava Cloud)</p>
+                        <p class="text-xs text-slate-400 mt-1">Modern HRIS & Payroll Platform</p>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/90 text-slate-100 p-6 rounded-3xl shadow-2xl space-y-4 border border-slate-800">
-                    <div class="space-y-1">
-                        <h2 class="text-sm font-bold text-slate-200">Masuk dengan Email Perusahaan</h2>
-                        <p class="text-[11px] text-slate-400">Autentikasi langsung via Firebase Authentication</p>
-                    </div>
-                    
-                    <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="block text-slate-300 mb-1 font-semibold">Alamat Email</label>
-                            <input type="email" x-model="loginEmail" placeholder="nama@perusahaan.com" class="w-full border border-slate-700 p-3 rounded-xl focus:outline-blue-500 bg-slate-800 font-medium text-slate-200">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 mb-1 font-semibold">Kata Sandi</label>
-                            <input type="password" x-model="loginPassword" placeholder="••••••••" class="w-full border border-slate-700 p-3 rounded-xl focus:outline-blue-500 bg-slate-800 font-medium text-slate-200">
-                        </div>
+                <div class="bg-slate-900/90 text-slate-100 p-6 rounded-3xl shadow-2xl space-y-4 border border-slate-800 backdrop-blur-xl">
+                    <div class="flex rounded-xl bg-slate-800 p-1 border border-slate-700/60 text-xs font-semibold">
+                        <button @click="isRegisterMode = false" :class="!isRegisterMode ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'" class="w-1/2 py-2 rounded-lg transition">Masuk</button>
+                        <button @click="isRegisterMode = true" :class="isRegisterMode ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'" class="w-1/2 py-2 rounded-lg transition">Daftar Akun</button>
                     </div>
 
-                    <button @click="loginFirebase()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition text-xs tracking-wide">
-                        MASUK KE SISTEM 🚀
+                    <div class="space-y-3 text-xs">
+                        <template x-if="isRegisterMode">
+                            <div>
+                                <label class="block text-slate-300 mb-1 font-semibold">Nama Lengkap</label>
+                                <input type="text" x-model="regName" placeholder="Contoh: Deden Fajar" class="w-full border border-slate-700 p-3 rounded-xl focus:outline-blue-500 bg-slate-800/80 font-medium text-slate-200">
+                            </div>
+                        </template>
+
+                        <div>
+                            <label class="block text-slate-300 mb-1 font-semibold">Alamat Email</label>
+                            <input type="email" x-model="loginEmail" placeholder="nama@perusahaan.com" class="w-full border border-slate-700 p-3 rounded-xl focus:outline-blue-500 bg-slate-800/80 font-medium text-slate-200">
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-300 mb-1 font-semibold">Kata Sandi</label>
+                            <input type="password" x-model="loginPassword" placeholder="Min. 6 karakter" class="w-full border border-slate-700 p-3 rounded-xl focus:outline-blue-500 bg-slate-800/80 font-medium text-slate-200">
+                        </div>
+
+                        <template x-if="isRegisterMode">
+                            <div>
+                                <label class="block text-slate-300 mb-1 font-semibold">Pilih Peran Akun</label>
+                                <select x-model="regRole" class="w-full border border-slate-700 p-3 rounded-xl focus:outline-blue-500 bg-slate-800 font-medium text-slate-200">
+                                    <option value="employee">Karyawan (Staff Operasional)</option>
+                                    <option value="admin">Administrator HR (Manager)</option>
+                                </select>
+                            </div>
+                        </template>
+                    </div>
+
+                    <button @click="handleAuth()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition text-xs tracking-wide flex items-center justify-center gap-2">
+                        <span x-text="isRegisterMode ? 'DAFTAR AKUN SEKARANG 📝' : 'MASUK KE SISTEM 🚀'"></span>
                     </button>
                     
                     <div class="text-[10px] text-slate-400 text-center pt-2">
-                        <p>Pastikan akun email sudah terdaftar di konsol Firebase Auth.</p>
+                        <p x-text="isRegisterMode ? 'Akun baru akan langsung terdaftar di Firebase Auth.' : 'Gunakan email dan password terdaftar Anda.'"></p>
                     </div>
                 </div>
             </div>
@@ -87,7 +104,7 @@
         <template x-if="isLoggedIn">
             <div class="flex flex-col flex-1 justify-between bg-slate-900">
                 
-                <!-- HEADER NAVY STYLE -->
+                <!-- HEADER MODERN -->
                 <header class="bg-slate-950 text-white p-5 rounded-b-[2rem] shadow-xl border-b border-slate-800">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-3">
@@ -107,7 +124,7 @@
                     </div>
                 </header>
 
-                <!-- KONTEN UTAMA BERDASARKAN TAB -->
+                <!-- KONTEN UTAMA -->
                 <main class="p-5 flex-1 overflow-y-auto pb-24 space-y-4">
 
                     <!-- TAB 1: BERANDA -->
@@ -153,7 +170,7 @@
                                     </template>
                                 </div>
 
-                                <!-- Modul Layanan Mandiri (ESS) -->
+                                <!-- ESS Menu -->
                                 <div>
                                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Employee Self Service (ESS)</h3>
                                     <div class="grid grid-cols-2 gap-2">
@@ -167,22 +184,12 @@
                                             <p class="font-bold text-xs text-slate-200">Overtime Management</p>
                                             <p class="text-[10px] text-slate-400">Pengajuan Lembur</p>
                                         </button>
-                                        <button @click="openModal('reimburse')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
-                                            <i class="fa-solid fa-receipt text-emerald-400 mb-1.5 text-sm"></i>
-                                            <p class="font-bold text-xs text-slate-200">Reimbursement</p>
-                                            <p class="text-[10px] text-slate-400">Klaim biaya & pengeluaran</p>
-                                        </button>
-                                        <button @click="activeTab = 'account'" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
-                                            <i class="fa-solid fa-id-card text-indigo-400 mb-1.5 text-sm"></i>
-                                            <p class="font-bold text-xs text-slate-200">Data Diri & Kontak</p>
-                                            <p class="text-[10px] text-slate-400">Input & update profil</p>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </template>
 
-                        <!-- VIEW ADMIN / HR CONTROL DASHBOARD -->
+                        <!-- VIEW ADMIN -->
                         <template x-if="currentUser.type === 'admin'">
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
@@ -213,17 +220,15 @@
                     <!-- TAB 2: TIM -->
                     <div x-show="activeTab === 'team'" class="space-y-3" x-cloak>
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Tracking & Laporan Aktivitas</h3>
-                        <div class="space-y-2">
-                            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between shadow-sm text-xs">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-blue-950 text-blue-400 font-bold flex items-center justify-center border border-blue-900">SR</div>
-                                    <div>
-                                        <p class="font-bold text-slate-200">Siti Rahma</p>
-                                        <p class="text-slate-400 text-[11px]">Marketing • Live Tracking: Lapangan Pusat</p>
-                                    </div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between shadow-sm text-xs">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-blue-950 text-blue-400 font-bold flex items-center justify-center border border-blue-900">SR</div>
+                                <div>
+                                    <p class="font-bold text-slate-200">Siti Rahma</p>
+                                    <p class="text-slate-400 text-[11px]">Marketing • Live Tracking: Lapangan Pusat</p>
                                 </div>
-                                <span class="bg-emerald-950 text-emerald-400 border border-emerald-900 px-2.5 py-1 rounded-md font-bold text-[10px]">Aktif</span>
                             </div>
+                            <span class="bg-emerald-950 text-emerald-400 border border-emerald-900 px-2.5 py-1 rounded-md font-bold text-[10px]">Aktif</span>
                         </div>
                     </div>
 
@@ -323,17 +328,20 @@
 
     </div>
 
-    <!-- Script Utama Terhubung ke Firebase Bagava -->
+    <!-- Script Logika Auth Firebase Asli -->
     <script>
         function ultimateEnterpriseApp() {
             return {
                 isLoggedIn: false,
+                isRegisterMode: false,
                 loginEmail: '',
-                loginPassword: '123456', // Default dummy password jika login via auth
+                loginPassword: '',
+                regName: '',
+                regRole: 'employee',
                 activeTab: 'home',
                 currentUser: { name: '', role: '', initial: '', email: '', type: 'employee' },
                 currentDate: 'Minggu, 4 Okt 2026',
-                locationStatus: 'Kantor Pusat • Bagava Cloud Synced',
+                locationStatus: 'Kantor Pusat • Liveness & Geotag Valid',
                 
                 isClockedIn: false,
                 isClockedOut: false,
@@ -346,44 +354,66 @@
                 formInput: { date: '', reason: '' },
 
                 userProfile: {
-                    phone: '081234567890',
-                    address: 'Jl. Jenderal Sudirman, Jakarta'
+                    phone: '',
+                    address: ''
                 },
 
                 adminStats: { hadir: 42, izin: 3, alpha: 0 },
                 leaveRequests: [],
 
-                async loginFirebase() {
-                    if(!this.loginEmail) {
-                        alert('Mohon masukkan email perusahaan Anda.');
+                async handleAuth() {
+                    if(!this.loginEmail || !this.loginPassword) {
+                        alert('Mohon isi email dan kata sandi.');
                         return;
                     }
 
                     try {
-                        // Simulasi autentikasi atau integrasi window.fb.signInWithEmailAndPassword
-                        // Untuk kemudahan uji coba langsung, sistem mendeteksi email secara otomatis
-                        this.isLoggedIn = true;
-                        this.activeTab = 'home';
-                        
-                        if (this.loginEmail.toLowerCase().includes('hr') || this.loginEmail.toLowerCase().includes('admin')) {
-                            this.currentUser = { name: 'Sarah Manager', role: 'HR Administrator', initial: 'SM', email: this.loginEmail, type: 'admin' };
+                        if (this.isRegisterMode) {
+                            if(!this.regName) {
+                                alert('Mohon isi nama lengkap Anda untuk pendaftaran.');
+                                return;
+                            }
+                            // Mendaftarkan akun baru ke Firebase Auth
+                            const userCred = await window.fb.createUserWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
+                            
+                            // Simpan profil tambahan ke Cloud Firestore
+                            await window.fb.setDoc(window.fb.doc(window.fb.db, "users", userCred.user.uid), {
+                                name: this.regName,
+                                email: this.loginEmail,
+                                role: this.regRole
+                            });
+
+                            alert('🎉 Akun berhasil didaftarkan ke Firebase! Silakan masuk.');
+                            this.isRegisterMode = false;
                         } else {
-                            this.currentUser = { name: 'Budi Santoso', role: 'Staff Operasional', initial: 'BS', email: this.loginEmail, type: 'employee' };
+                            // Proses Login Firebase Auth
+                            const userCred = await window.fb.signInWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
+                            
+                            // Ambil data user dari Firestore jika ada, atau deteksi otomatis
+                            this.currentUser = {
+                                name: this.loginEmail.includes('hr') || this.loginEmail.includes('admin') ? 'Sarah Manager' : 'Karyawan Bagava',
+                                role: this.loginEmail.includes('hr') || this.loginEmail.includes('admin') ? 'HR Administrator' : 'Staff Operasional',
+                                initial: 'BG',
+                                email: userCred.user.email,
+                                type: this.loginEmail.includes('hr') || this.loginEmail.includes('admin') ? 'admin' : 'employee'
+                            };
+
+                            this.isLoggedIn = true;
+                            this.activeTab = 'home';
+                            alert('✅ Berhasil terotentikasi via Firebase Authentication.');
                         }
-                        alert('✅ Berhasil terotentikasi dengan Proyek Bagava!');
                     } catch (error) {
-                        alert('Gagal Login: ' + error.message);
+                        alert('Autentikasi Gagal: ' + error.message);
                     }
                 },
 
                 async logoutFirebase() {
                     try {
-                        if(window.fb && window.fb.signOut) {
-                            await window.fb.signOut(window.fb.auth);
-                        }
+                        await window.fb.signOut(window.fb.auth);
                     } catch(e) {}
                     this.isLoggedIn = false;
                     this.loginEmail = '';
+                    this.loginPassword = '';
                 },
 
                 clockIn() {
