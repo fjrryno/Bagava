@@ -37,6 +37,11 @@
         [x-cloak] { display: none !important; }
         body { -webkit-user-select: none; user-select: none; background-color: #020617; }
         input, textarea, select { -webkit-user-select: text; user-select: text; }
+        /* Efek Mirror Kamera Depan */
+        #cameraStream {
+            transform: scaleX(-1);
+            -webkit-transform: scaleX(-1);
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-slate-100 flex justify-center items-center min-h-screen" x-data="ultimateEnterpriseApp()" x-init="initAuthListener()">
@@ -356,7 +361,7 @@
                 </button>
             </nav>
 
-            <!-- MODAL KAMERA OTOMATIS (WATERMARK WAKTU & LOKASI) -->
+            <!-- MODAL KAMERA OTOMATIS (MIRROR VIEW + WATERMARK WAKTU & LOKASI) -->
             <div x-show="showCameraModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-5 z-50 animate-in fade-in" x-cloak>
                 <div class="flex justify-between items-center text-white">
                     <div>
@@ -366,7 +371,7 @@
                     <button @click="closeCamera()" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold">✕</button>
                 </div>
 
-                <!-- Viewfinder Kamera -->
+                <!-- Viewfinder Kamera Mirror -->
                 <div class="relative w-full max-w-xs h-96 mx-auto rounded-3xl overflow-hidden border-2 border-blue-500 shadow-2xl bg-black">
                     <video id="cameraStream" autoplay playsinline class="w-full h-full object-cover"></video>
                     <!-- Watermark Overlay di dalam kamera -->
@@ -515,7 +520,7 @@
 
     </div>
 
-    <!-- Script Logika Ultimate Enterprise dengan Kamera & Kehadiran Otomatis -->
+    <!-- Script Logika Ultimate Enterprise dengan Efek Mirror -->
     <script>
         function ultimateEnterpriseApp() {
             return {
@@ -541,7 +546,7 @@
                 showAjukanModal: false,
                 showAllAppsModal: false,
                 showCameraModal: false,
-                cameraMode: 'in', // 'in' atau 'out'
+                cameraMode: 'in',
                 mediaStream: null,
                 liveCameraTime: '',
                 liveCameraLocation: 'Mendeteksi lokasi GPS...',
@@ -694,13 +699,11 @@
                     this.loginPassword = '';
                 },
 
-                // Buka Kamera & Ambil Lokasi GPS Realtime
                 async openCamera(mode) {
                     this.cameraMode = mode;
                     this.showCameraModal = true;
                     this.liveCameraTime = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
                     
-                    // Ambil Lokasi GPS
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(
                             (position) => {
@@ -742,7 +745,6 @@
                         this.isClockedIn = true;
                         this.attendanceStatus = 'Status: Sedang Bertugas (Clock-In Aktif)';
 
-                        // Simpan ke Firestore Attendance
                         try {
                             await window.fb.addDoc(window.fb.collection(window.fb.db, "attendance"), {
                                 userId: this.currentUserId,
@@ -762,7 +764,6 @@
                         this.attendanceStatus = 'Status: Selesai Shift Kerja Hari Ini';
 
                         try {
-                            // Update dokumen kehadiran terakhir
                             const querySnapshot = await window.fb.getDocs(window.fb.collection(window.fb.db, "attendance"));
                             querySnapshot.forEach(async (docSnap) => {
                                 const data = docSnap.data();
