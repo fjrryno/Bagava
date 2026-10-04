@@ -42,7 +42,7 @@
 <body class="font-sans antialiased text-slate-100 flex justify-center items-center min-h-screen" x-data="ultimateEnterpriseApp()" x-init="initAuthListener()">
 
     <!-- App Container Wrapper (Mobile Native Frame Ready for PlayStore/AppStore) -->
-    <div class="w-full max-w-md h-screen md:h-[844px] bg-slate-50 text-slate-900 shadow-2xl flex flex-col justify-between relative overflow-hidden md:rounded-[3rem] md:border-8 md:border-slate-800">
+    <div class="w-full max-w-md h-screen md:h-[844px] bg-slate-950 text-slate-100 shadow-2xl flex flex-col justify-between relative overflow-hidden md:rounded-[3rem] md:border-8 md:border-slate-800">
         
         <!-- ================= HALAMAN AUTENTIKASI ================= -->
         <div x-show="!isLoggedIn" class="p-8 flex-1 flex flex-col justify-center space-y-6 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white overflow-y-auto" x-cloak>
@@ -90,18 +90,18 @@
         </div>
 
         <!-- ================= HALAMAN UTAMA APLIKASI ================= -->
-        <div x-show="isLoggedIn" class="flex flex-col flex-1 justify-between bg-slate-50 h-full relative" x-cloak>
+        <div x-show="isLoggedIn" class="flex flex-col flex-1 justify-between bg-slate-950 h-full relative" x-cloak>
             
-            <!-- HEADER PROFIL GAYA MEKARI TALENTA -->
-            <header class="bg-white text-slate-900 p-4 px-5 shadow-sm flex justify-between items-center shrink-0 border-b border-slate-200">
+            <!-- HEADER PROFIL TEMA NAVY -->
+            <header class="bg-slate-900 text-slate-100 p-4 px-5 shadow-md flex justify-between items-center shrink-0 border-b border-slate-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-md" x-text="currentUser.initial"></div>
+                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-md border border-blue-500/30" x-text="currentUser.initial"></div>
                     <div>
-                        <p class="text-[11px] text-slate-500 font-medium">Selamat malam,</p>
-                        <h1 class="text-xs font-bold tracking-tight text-slate-800" x-text="currentUser.name"></h1>
+                        <p class="text-[11px] text-slate-400 font-medium">Selamat malam,</p>
+                        <h1 class="text-xs font-bold tracking-tight text-slate-200" x-text="currentUser.name"></h1>
                     </div>
                 </div>
-                <button @click="showPopup('Notifikasi', 'Tidak ada pemberitahuan baru saat ini.')" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-rose-500 relative hover:bg-slate-200 transition">
+                <button @click="showPopup('Notifikasi', 'Tidak ada pemberitahuan baru saat ini.')" class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-blue-400 relative hover:bg-slate-700 transition border border-slate-700">
                     <i class="fa-solid fa-gift text-sm"></i>
                 </button>
             </header>
@@ -112,119 +112,146 @@
                 <!-- TAB 1: BERANDA -->
                 <div x-show="activeTab === 'home'" class="space-y-4" x-cloak>
                     
-                    <!-- BANNER SHIFT / STATUS KERJA -->
-                    <div class="bg-gradient-to-r from-red-600 to-rose-700 text-white p-5 rounded-2xl shadow-md text-center relative overflow-hidden space-y-1">
-                        <p class="text-xs font-medium text-rose-100">Sun, 04 Oct 2026</p>
-                        <h2 class="text-base font-extrabold">Tidak ada shift hari ini.</h2>
-                        <p class="text-xs text-rose-100 font-normal">Selamat menikmati hari libur!</p>
+                    <!-- KARTU SHIFT & CLOCK IN / CLOCK OUT INTERAKTIF -->
+                    <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-800 text-center relative overflow-hidden space-y-3">
+                        <div class="absolute top-0 right-0 bg-blue-900/60 text-blue-300 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-blue-800">
+                            Shift Aktif: Normal 🔒
+                        </div>
+                        
+                        <p class="text-xs font-medium text-slate-400">Sun, 04 Oct 2026</p>
+                        
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-200" x-text="attendanceStatus"></h2>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                            <div>
+                                <p class="text-slate-400 font-medium">Clock-In</p>
+                                <p class="font-bold text-blue-400 text-sm" x-text="clockInTime || '--:--'"></p>
+                            </div>
+                            <div>
+                                <p class="text-slate-400 font-medium">Clock-Out</p>
+                                <p class="font-bold text-blue-400 text-sm" x-text="clockOutTime || '--:--'"></p>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Aksi Shift -->
+                        <div class="pt-1">
+                            <template x-if="!isClockedIn">
+                                <button @click="clockIn()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                                    <i class="fa-solid fa-fingerprint"></i> Clock In Sekarang ⚡
+                                </button>
+                            </template>
+                            <template x-if="isClockedIn && !isClockedOut">
+                                <button @click="clockOut()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
+                                    <i class="fa-solid fa-person-walking-arrow-right"></i> Clock Out Selesai Kerja
+                                </button>
+                            </template>
+                            <template x-if="isClockedIn && isClockedOut">
+                                <p class="text-xs text-emerald-400 font-semibold bg-emerald-950/50 py-2.5 rounded-lg border border-emerald-900">✨ Kehadiran shift hari ini telah terekam.</p>
+                            </template>
+                        </div>
                     </div>
 
-                    <!-- GRID MENU UTAMA (SEPERTI GAMBAR REFERENSI) -->
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-4 gap-4 text-center text-xs">
-                        <button @click="openModal('reimburse')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
+                    <!-- GRID MENU UTAMA TEMA NAVY (Mekari Flex Dihilangkan) -->
+                    <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 grid grid-cols-3 gap-4 text-center text-xs">
+                        <button @click="openModal('Reimbursement')" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-cyan-950 text-cyan-400 flex items-center justify-center text-lg shadow-sm border border-cyan-900 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-receipt"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-700">Reimbursement</span>
+                            <span class="text-[11px] font-medium text-slate-300">Reimbursement</span>
                         </button>
-                        <button @click="openModal('cuti')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
+                        <button @click="openModal('Cuti')" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-950 text-indigo-400 flex items-center justify-center text-lg shadow-sm border border-indigo-900 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-700">Cuti</span>
+                            <span class="text-[11px] font-medium text-slate-300">Cuti</span>
                         </button>
                         <button @click="clockIn()" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-rose-950 text-rose-400 flex items-center justify-center text-lg shadow-sm border border-rose-900 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-700">Presensi Online</span>
-                        </button>
-                        <button @click="showPopup('Mekari Flex', 'Saldo fleksibel benefit Anda aktif senilai Rp 2.500.000.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <span class="text-[11px] font-medium text-slate-700">Mekari Flex</span>
+                            <span class="text-[11px] font-medium text-slate-300">Presensi Online</span>
                         </button>
 
                         <button @click="activeTab = 'team'" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-950 text-amber-400 flex items-center justify-center text-lg shadow-sm border border-amber-900 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-calendar-check"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-700">Daftar Kehadiran</span>
+                            <span class="text-[11px] font-medium text-slate-300">Daftar Kehadiran</span>
                         </button>
                         <button @click="activeTab = 'payroll'" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-950 text-blue-400 flex items-center justify-center text-lg shadow-sm border border-blue-900 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-wallet"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-700">Slip Gaji</span>
-                        </button>
-                        <button @click="showPopup('Kalendar Perusahaan', 'Jadwal shift, libur nasional, dan agenda meeting bulanan.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
-                                <i class="fa-solid fa-calendar"></i>
-                            </div>
-                            <span class="text-[11px] font-medium text-slate-700">Kalender</span>
+                            <span class="text-[11px] font-medium text-slate-300">Slip Gaji</span>
                         </button>
                         <button @click="showAllAppsModal = true" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-slate-200 text-slate-700 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-800 text-slate-200 flex items-center justify-center text-lg shadow-sm border border-slate-700 group-hover:scale-105 transition">
                                 <i class="fa-solid fa-grip"></i>
                             </div>
-                            <span class="text-[11px] font-medium text-slate-700">Semua Aplikasi</span>
+                            <span class="text-[11px] font-medium text-slate-300">Semua Aplikasi</span>
                         </button>
                     </div>
 
-                    <!-- BANNER PROMO / INFO -->
-                    <div class="bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 text-white p-4 rounded-2xl shadow-md flex justify-between items-center relative overflow-hidden">
+                    <!-- BANNER PROMO / INFO NAVY -->
+                    <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-4 rounded-2xl shadow-md flex justify-between items-center relative overflow-hidden border border-blue-800/60">
                         <div class="space-y-1 w-2/3">
                             <h3 class="text-xs font-bold leading-tight">Makin flexible! Kini performance review dapat dilakukan di Mobile App</h3>
-                            <button @click="showPopup('Performance Review', 'Fitur review kinerja mandiri sudah aktif.')" class="bg-amber-400 hover:bg-amber-300 text-slate-900 text-[10px] font-extrabold px-3 py-1.5 rounded-lg shadow transition mt-1">Coba sekarang</button>
+                            <button @click="showPopup('Performance Review', 'Fitur review kinerja mandiri sudah aktif.')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-3 py-1.5 rounded-lg shadow transition mt-1">Coba sekarang</button>
                         </div>
-                        <div class="text-3xl opacity-80">
+                        <div class="text-3xl text-blue-400 opacity-90">
                             <i class="fa-solid fa-clipboard-list"></i>
                         </div>
                     </div>
 
                     <!-- BAGIAN PENGUMUMAN -->
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+                    <div class="bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Pengumuman</h3>
-                            <button @click="showPopup('Semua Pengumuman', 'Seluruh arsip pengumuman instansi tersedia.')" class="text-xs text-blue-600 font-semibold hover:underline">Lihat semua</button>
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Pengumuman</h3>
+                            <button @click="showPopup('Semua Pengumuman', 'Seluruh arsip pengumuman instansi tersedia.')" class="text-xs text-blue-400 font-semibold hover:underline">Lihat semua</button>
                         </div>
 
-                        <div class="space-y-3 text-xs divide-y divide-slate-100">
+                        <div class="space-y-3 text-xs divide-y divide-slate-800">
                             <div class="pt-2 flex justify-between items-start">
                                 <div class="space-y-0.5 pr-2">
-                                    <p class="font-bold text-slate-800 leading-snug">KELENGKAPAN ADMINISTRASI ABSENSI – SEPTEMBER 2026</p>
-                                    <p class="text-[11px] text-slate-500 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Indrawan</p>
+                                    <p class="font-bold text-slate-200 leading-snug">KELENGKAPAN ADMINISTRASI ABSENSI – SEPTEMBER 2026</p>
+                                    <p class="text-[11px] text-slate-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Indrawan</p>
                                 </div>
-                                <span class="text-[10px] text-slate-400 shrink-0 font-medium">29 Sep</span>
+                                <span class="text-[10px] text-slate-500 shrink-0 font-medium">29 Sep</span>
                             </div>
                             <div class="pt-3 flex justify-between items-start">
                                 <div class="space-y-0.5 pr-2">
-                                    <p class="font-bold text-slate-800 leading-snug">KELENGKAPAN ADMINISTRASI</p>
-                                    <p class="text-[11px] text-slate-500 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-400"></span> HR Department</p>
+                                    <p class="font-bold text-slate-200 leading-snug">KELENGKAPAN ADMINISTRASI</p>
+                                    <p class="text-[11px] text-slate-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> HR Department</p>
                                 </div>
-                                <span class="text-[10px] text-slate-400 shrink-0 font-medium">28 Aug</span>
+                                <span class="text-[10px] text-slate-500 shrink-0 font-medium">28 Aug</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 2: PENGAJUAN / TIM -->
+                <!-- TAB 2: PENGAJUAN / RIWAYAT -->
                 <div x-show="activeTab === 'team'" class="space-y-4" x-cloak>
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Riwayat Pengajuan Mandiri</h3>
+                    <div class="bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Riwayat Pengajuan Mandiri</h3>
+                            <button @click="showAjukanModal = true" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow transition">
+                                <i class="fa-solid fa-plus mr-1"></i> Buat Pengajuan
+                            </button>
+                        </div>
                         <div class="space-y-2">
                             <template x-for="req in leaveRequests" :key="req.id">
-                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs flex justify-between items-center">
+                                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs flex justify-between items-center">
                                     <div class="space-y-0.5">
-                                        <p class="font-bold text-slate-800" x-text="req.type + ' - ' + req.date"></p>
-                                        <p class="text-slate-500 text-[11px]" x-text="req.reason"></p>
+                                        <p class="font-bold text-slate-200" x-text="req.type + ' - ' + req.date"></p>
+                                        <p class="text-slate-400 text-[11px]" x-text="req.reason"></p>
                                     </div>
-                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-100 text-amber-700" x-text="req.status"></span>
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-900" x-text="req.status"></span>
                                 </div>
                             </template>
                             <template x-if="leaveRequests.length === 0">
-                                <p class="text-slate-400 text-center py-6 text-xs">Belum ada riwayat pengajuan.</p>
+                                <p class="text-slate-500 text-center py-6 text-xs">Belum ada riwayat pengajuan.</p>
                             </template>
                         </div>
                     </div>
@@ -232,10 +259,10 @@
 
                 <!-- TAB 3: PAYROLL / SLIP GAJI -->
                 <div x-show="activeTab === 'payroll'" class="space-y-4" x-cloak>
-                    <div class="bg-gradient-to-br from-blue-900 to-slate-900 text-white p-5 rounded-2xl shadow-lg space-y-3">
-                        <p class="text-xs text-blue-200 font-medium">Take Home Pay (September 2026)</p>
+                    <div class="bg-gradient-to-br from-blue-950 via-slate-900 to-slate-950 text-white p-5 rounded-2xl shadow-lg space-y-3 border border-slate-800">
+                        <p class="text-xs text-blue-300 font-medium">Take Home Pay (September 2026)</p>
                         <h2 class="text-2xl font-extrabold tracking-tight">Rp 5.450.000</h2>
-                        <div class="text-[11px] text-slate-300 pt-2 border-t border-blue-800/60 space-y-1">
+                        <div class="text-[11px] text-slate-300 pt-2 border-t border-slate-800 space-y-1">
                             <div class="flex justify-between"><span>Gaji Pokok & Tunjangan:</span> <span class="font-bold">Rp 6.000.000</span></div>
                             <div class="flex justify-between"><span>Potongan BPJS & PPh 21:</span> <span class="text-rose-400 font-bold">- Rp 550.000</span></div>
                         </div>
@@ -247,27 +274,27 @@
 
                 <!-- TAB 4: AKUN & PROFIL -->
                 <div x-show="activeTab === 'account'" class="space-y-4" x-cloak>
-                    <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm text-center space-y-3">
-                        <div class="w-16 h-16 rounded-full bg-blue-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto shadow-md" x-text="currentUser.initial"></div>
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm text-center space-y-3">
+                        <div class="w-16 h-16 rounded-full bg-blue-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto shadow-md border border-blue-500" x-text="currentUser.initial"></div>
                         <div>
-                            <h3 class="font-bold text-slate-800 text-base" x-text="currentUser.name"></h3>
-                            <p class="text-xs text-slate-500" x-text="currentUser.email"></p>
-                            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700" x-text="currentUser.role"></span>
+                            <h3 class="font-bold text-slate-100 text-base" x-text="currentUser.name"></h3>
+                            <p class="text-xs text-slate-400" x-text="currentUser.email"></p>
+                            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-950 text-blue-400 border border-blue-900" x-text="currentUser.role"></span>
                         </div>
                     </div>
 
                     <!-- Form Data Diri -->
-                    <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-3 text-xs">
-                        <h4 class="font-bold text-slate-800 border-b border-slate-100 pb-2"><i class="fa-solid fa-address-card text-blue-600 mr-1.5"></i> Data Diri & Kontak Darurat</h4>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3 text-xs">
+                        <h4 class="font-bold text-slate-200 border-b border-slate-800 pb-2"><i class="fa-solid fa-address-card text-blue-400 mr-1.5"></i> Data Diri & Kontak Darurat</h4>
                         
                         <div class="space-y-2.5">
                             <div>
-                                <label class="block text-slate-600 mb-1 font-medium">Nomor Telepon / WhatsApp</label>
-                                <input type="text" x-model="userProfile.phone" placeholder="081234567890" class="w-full border border-slate-300 p-2.5 rounded-xl bg-slate-50 text-slate-800 focus:outline-blue-500">
+                                <label class="block text-slate-400 mb-1 font-medium">Nomor Telepon / WhatsApp</label>
+                                <input type="text" x-model="userProfile.phone" placeholder="081234567890" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200 focus:outline-blue-500">
                             </div>
                             <div>
-                                <label class="block text-slate-600 mb-1 font-medium">Alamat Domisili</label>
-                                <textarea x-model="userProfile.address" rows="2" placeholder="Masukkan alamat lengkap..." class="w-full border border-slate-300 p-2.5 rounded-xl bg-slate-50 text-slate-800 focus:outline-blue-500"></textarea>
+                                <label class="block text-slate-400 mb-1 font-medium">Alamat Domisili</label>
+                                <textarea x-model="userProfile.address" rows="2" placeholder="Masukkan alamat lengkap..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200 focus:outline-blue-500"></textarea>
                             </div>
                             <button @click="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition shadow-md mt-2">
                                 Simpan ke Cloud Firestore 💾
@@ -275,141 +302,143 @@
                         </div>
                     </div>
 
-                    <button @click="logoutFirebase()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-3 rounded-2xl text-xs transition border border-rose-200 shadow-sm">
+                    <button @click="logoutFirebase()" class="w-full bg-rose-950/50 hover:bg-rose-900/50 text-rose-400 font-bold py-3 rounded-2xl text-xs transition border border-rose-900 shadow-sm">
                         Keluar dari Sesi <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
                     </button>
                 </div>
 
             </main>
 
-            <!-- NAVIGATION BAR BAWAH (GAYA MEKARI TALENTA) -->
-            <nav class="bg-white border-t border-slate-200 p-2 px-4 flex justify-around text-center text-xs text-slate-500 absolute bottom-0 w-full shadow-lg z-20">
-                <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-blue-600 font-bold' : 'hover:text-slate-800'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
+            <!-- NAVIGATION BAR BAWAH TEMA NAVY -->
+            <nav class="bg-slate-900 border-t border-slate-800 p-2 px-4 flex justify-around text-center text-xs text-slate-400 absolute bottom-0 w-full shadow-lg z-20">
+                <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-blue-400 font-bold' : 'hover:text-slate-200'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
                     <i class="fa-solid fa-house text-sm"></i> Beranda
                 </button>
-                <button @click="activeTab = 'team'" :class="activeTab === 'team' ? 'text-blue-600 font-bold' : 'hover:text-slate-800'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
-                    <i class="fa-solid fa-plus text-sm"></i> Pengajuan
+                <button @click="showAjukanModal = true" class="flex flex-col items-center gap-1 py-1 px-3 transition text-slate-400 hover:text-slate-200">
+                    <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md"><i class="fa-solid fa-plus text-xs"></i></div>
+                    <span>Pengajuan</span>
                 </button>
-                <button @click="showPopup('Inbox HR', 'Anda memiliki 39 pesan masuk belum dibaca.')" class="flex flex-col items-center gap-1 py-1 px-3 transition relative hover:text-slate-800">
+                <button @click="showPopup('Inbox HR', 'Anda memiliki 39 pesan masuk belum dibaca.')" class="flex flex-col items-center gap-1 py-1 px-3 transition relative hover:text-slate-200">
                     <i class="fa-solid fa-bell text-sm"></i> Inbox
-                    <span class="absolute top-0 right-2 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">39</span>
+                    <span class="absolute top-0 right-2 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">39</span>
                 </button>
-                <button @click="activeTab = 'account'" :class="activeTab === 'account' ? 'text-blue-600 font-bold' : 'hover:text-slate-800'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
+                <button @click="activeTab = 'account'" :class="activeTab === 'account' ? 'text-blue-400 font-bold' : 'hover:text-slate-200'" class="flex flex-col items-center gap-1 py-1 px-3 transition">
                     <i class="fa-solid fa-user text-sm"></i> Akun
                 </button>
             </nav>
 
-            <!-- MODAL "SEMUA APLIKASI" (MENGAMBIL DARI REFERENSI GAMBAR KEDUA) -->
-            <div x-show="showAllAppsModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-end md:items-center justify-center z-50 animate-in fade-in" x-cloak>
-                <div class="bg-white w-full max-w-md rounded-t-[2.5rem] md:rounded-3xl p-6 shadow-2xl space-y-5 max-h-[85vh] overflow-y-auto">
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <h3 class="font-extrabold text-base text-slate-900">Semua Aplikasi</h3>
-                        <button @click="showAllAppsModal = false" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 font-bold">✕</button>
+            <!-- MODAL "AJUKAN UNTUK" (SESUAI GAMBAR REFERENSI ANDA) -->
+            <div x-show="showAjukanModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-end md:items-center justify-center z-50 animate-in fade-in" x-cloak>
+                <div class="bg-slate-900 text-slate-100 w-full max-w-md rounded-t-[2.5rem] md:rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-800">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-extrabold text-base text-slate-100">Ajukan untuk</h3>
+                        <button @click="showAjukanModal = false" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-700 font-bold">✕</button>
                     </div>
 
-                    <!-- GRID SEMUA APLIKASI LENGKAP -->
-                    <div class="grid grid-cols-4 gap-4 text-center text-xs">
-                        <button @click="openModal('reimburse'); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-lg"><i class="fa-solid fa-receipt"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Reimbursement</span>
-                        </button>
-                        <button @click="openModal('cuti'); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Cuti</span>
-                        </button>
-                        <button @click="clockIn(); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg"><i class="fa-solid fa-location-dot"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Presensi Online</span>
-                        </button>
-                        <button @click="showPopup('Mekari Flex', 'Layanan benefit fleksibel aktif.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg"><i class="fa-solid fa-plus"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Mekari Flex</span>
+                    <!-- DAFTAR MENU PENGAJUAN SESUAI REFERENSI GAMBAR -->
+                    <div class="space-y-1 text-xs">
+                        <button @click="openModal('Reimbursement'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-cyan-950 text-cyan-400 flex items-center justify-center border border-cyan-900"><i class="fa-solid fa-receipt text-sm"></i></div>
+                                <span class="font-bold text-slate-200 text-sm">Reimbursement</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
 
-                        <button @click="activeTab = 'team'; showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg"><i class="fa-solid fa-calendar-check"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Daftar Kehadiran</span>
-                        </button>
-                        <button @click="activeTab = 'payroll'; showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-wallet"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Slip Gaji</span>
-                        </button>
-                        <button @click="showPopup('Kalendar', 'Kalender kerja perusahaan.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-lg"><i class="fa-solid fa-calendar"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Kalender</span>
-                        </button>
-                        <button @click="showPopup('File', 'Cloud storage dokumen karyawan.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-lg"><i class="fa-solid fa-folder"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">File</span>
+                        <button @click="openModal('Cuti'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-950 text-indigo-400 flex items-center justify-center border border-indigo-900"><i class="fa-solid fa-clock-rotate-left text-sm"></i></div>
+                                <span class="font-bold text-slate-200 text-sm">Cuti</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
 
-                        <button @click="showPopup('Review', 'Review kinerja tahunan.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center text-lg"><i class="fa-solid fa-star"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Review</span>
-                        </button>
-                        <button @click="showPopup('Aset', 'Pencatatan inventaris kantor.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-lg"><i class="fa-solid fa-box"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Aset</span>
-                        </button>
-                        <button @click="showPopup('Formulir', 'Formulir internal HR.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg"><i class="fa-solid fa-file-lines"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Formulir</span>
-                        </button>
-                        <button @click="showPopup('Goal', 'KPI dan target karyawan.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-lg"><i class="fa-solid fa-bullseye"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Goal</span>
+                        <button @click="openModal('Absensi'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-rose-950 text-rose-400 flex items-center justify-center border border-rose-900"><i class="fa-solid fa-location-dot text-sm"></i></div>
+                                <span class="font-bold text-slate-200 text-sm">Absensi</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
 
-                        <button @click="showPopup('Timesheet', 'Rekap jam kerja harian.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center text-lg"><i class="fa-solid fa-list-check"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Timesheet</span>
-                        </button>
-                        <button @click="showPopup('Peringatan', 'Surat peringatan kedisiplinan.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Peringatan</span>
-                        </button>
-                        <button @click="showPopup('Proyek', 'Manajemen tugas proyek.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-fuchsia-100 text-fuchsia-600 flex items-center justify-center text-lg"><i class="fa-solid fa-diagram-project"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Proyek</span>
-                        </button>
-                        <button @click="showPopup('Tugas', 'Daftar tugas harian.')" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-circle-check"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Tugas</span>
+                        <button @click="openModal('Perubahan shift'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-orange-950 text-orange-400 flex items-center justify-center border border-orange-900"><i class="fa-solid fa-briefcase text-sm"></i></div>
+                                <span class="font-bold text-slate-200 text-sm">Perubahan shift</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
 
-                        <button @click="openModal('cuti'); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-calendar-days"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Pengajuan Kehadiran</span>
-                        </button>
-                        <button @click="openModal('lembur'); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
-                            <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-lg"><i class="fa-solid fa-business-time"></i></div>
-                            <span class="text-[11px] font-medium text-slate-700">Pengajuan Ganti Shift</span>
+                        <button @click="openModal('Perubahan data'); showAjukanModal = false;" class="w-full p-3.5 hover:bg-slate-800/80 rounded-2xl flex items-center justify-between transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-950 text-blue-400 flex items-center justify-center border border-blue-900"><i class="fa-solid fa-id-card text-sm"></i></div>
+                                <span class="font-bold text-slate-200 text-sm">Perubahan data</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-500"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- MODAL FORM ESS (CUTI/LEMBUR/REIMBURSE) -->
+            <!-- MODAL "SEMUA APLIKASI" -->
+            <div x-show="showAllAppsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-end md:items-center justify-center z-50 animate-in fade-in" x-cloak>
+                <div class="bg-slate-900 text-slate-100 w-full max-w-md rounded-t-[2.5rem] md:rounded-3xl p-6 shadow-2xl space-y-5 max-h-[85vh] overflow-y-auto border border-slate-800">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-extrabold text-base text-slate-100">Semua Aplikasi</h3>
+                        <button @click="showAllAppsModal = false" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-700 font-bold">✕</button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 text-center text-xs">
+                        <button @click="openModal('Reimbursement'); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-cyan-950 text-cyan-400 flex items-center justify-center text-lg border border-cyan-900"><i class="fa-solid fa-receipt"></i></div>
+                            <span class="text-[11px] font-medium text-slate-300">Reimbursement</span>
+                        </button>
+                        <button @click="openModal('Cuti'); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-950 text-indigo-400 flex items-center justify-center text-lg border border-indigo-900"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <span class="text-[11px] font-medium text-slate-300">Cuti</span>
+                        </button>
+                        <button @click="clockIn(); showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-rose-950 text-rose-400 flex items-center justify-center text-lg border border-rose-900"><i class="fa-solid fa-location-dot"></i></div>
+                            <span class="text-[11px] font-medium text-slate-300">Presensi Online</span>
+                        </button>
+
+                        <button @click="activeTab = 'team'; showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-950 text-amber-400 flex items-center justify-center text-lg border border-amber-900"><i class="fa-solid fa-calendar-check"></i></div>
+                            <span class="text-[11px] font-medium text-slate-300">Daftar Kehadiran</span>
+                        </button>
+                        <button @click="activeTab = 'payroll'; showAllAppsModal = false;" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-950 text-blue-400 flex items-center justify-center text-lg border border-blue-900"><i class="fa-solid fa-wallet"></i></div>
+                            <span class="text-[11px] font-medium text-slate-300">Slip Gaji</span>
+                        </button>
+                        <button @click="showPopup('Kalendar', 'Kalender kerja perusahaan.')" class="flex flex-col items-center gap-1.5 group">
+                            <div class="w-12 h-12 rounded-2xl bg-pink-950 text-pink-400 flex items-center justify-center text-lg border border-pink-900"><i class="fa-solid fa-calendar"></i></div>
+                            <span class="text-[11px] font-medium text-slate-300">Kalender</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL FORM ESS (PENGISIAN PENGAJUAN) -->
             <div x-show="showModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
-                <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <h3 class="font-extrabold text-sm text-slate-900" x-text="'Formulir ' + modalType.toUpperCase()"></h3>
-                        <button @click="showModal = false" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">✕</button>
+                <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-800">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-extrabold text-sm text-slate-100" x-text="'Formulir ' + modalType"></h3>
+                        <button @click="showModal = false" class="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold hover:bg-slate-700">✕</button>
                     </div>
                     
                     <div class="space-y-3 text-xs">
                         <div>
-                            <label class="block text-slate-700 mb-1 font-semibold">Tanggal / Periode</label>
-                            <input type="date" x-model="formInput.date" class="w-full border border-slate-300 p-2.5 rounded-xl bg-slate-50 text-slate-800 focus:outline-blue-500">
+                            <label class="block text-slate-300 mb-1 font-semibold">Tanggal / Periode</label>
+                            <input type="date" x-model="formInput.date" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200 focus:outline-blue-500">
                         </div>
                         <div>
-                            <label class="block text-slate-700 mb-1 font-semibold">Keterangan / Alasan</label>
-                            <textarea x-model="formInput.reason" rows="3" placeholder="Tuliskan keterangan lengkap..." class="w-full border border-slate-300 p-2.5 rounded-xl bg-slate-50 text-slate-800 focus:outline-blue-500"></textarea>
+                            <label class="block text-slate-300 mb-1 font-semibold">Keterangan / Alasan</label>
+                            <textarea x-model="formInput.reason" rows="3" placeholder="Tuliskan keterangan lengkap..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200 focus:outline-blue-500"></textarea>
                         </div>
                     </div>
 
                     <div class="flex gap-2 pt-2">
-                        <button @click="showModal = false" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition">Batal</button>
+                        <button @click="showModal = false" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">Batal</button>
                         <button @click="submitRequest()" class="w-1/2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">Kirim</button>
                     </div>
                 </div>
@@ -417,13 +446,13 @@
 
             <!-- MODAL POPUP NOTIFIKASI PROFESIONAL -->
             <div x-show="showPopupModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
-                <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 text-center">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-xl border border-blue-200">
+                <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 text-center border border-slate-800">
+                    <div class="w-12 h-12 bg-blue-950 text-blue-400 rounded-full flex items-center justify-center mx-auto text-xl border border-blue-900">
                         <i class="fa-solid fa-circle-info"></i>
                     </div>
                     <div class="space-y-1">
-                        <h3 class="font-bold text-sm text-slate-900" x-text="popupTitle"></h3>
-                        <p class="text-xs text-slate-500" x-text="popupMessage"></p>
+                        <h3 class="font-bold text-sm text-slate-100" x-text="popupTitle"></h3>
+                        <p class="text-xs text-slate-400" x-text="popupMessage"></p>
                     </div>
                     <button @click="showPopupModal = false" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition">
                         Mengerti / Tutup
@@ -455,11 +484,12 @@
                 isClockedOut: false,
                 clockInTime: '',
                 clockOutTime: '',
-                attendanceStatus: 'Belum Melakukan Absen',
+                attendanceStatus: 'Belum Melakukan Clock In Shift',
 
                 showModal: false,
+                showAjukanModal: false,
                 showAllAppsModal: false,
-                modalType: 'cuti',
+                modalType: 'Cuti',
                 formInput: { date: '', reason: '' },
 
                 showPopupModal: false,
@@ -614,16 +644,16 @@
                     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     this.clockInTime = timeNow + ' WIB';
                     this.isClockedIn = true;
-                    this.attendanceStatus = 'Hadir (Cloud Synced)';
-                    this.showPopup('Presensi Berhasil', '⚡ Liveness & Geotag valid. Absensi tercatat ke Firestore.');
+                    this.attendanceStatus = 'Status: Sedang Bertugas (Clock-In Aktif)';
+                    this.showPopup('Clock In Berhasil', '⚡ Absensi shift berhasil tercatat ke Cloud Firestore.');
                 },
 
                 clockOut() {
                     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     this.clockOutTime = timeNow + ' WIB';
                     this.isClockedOut = true;
-                    this.attendanceStatus = 'Selesai Jam Kerja Harian';
-                    this.showPopup('Clock-Out Berhasil', '✅ Timesheet harian berhasil direkap.');
+                    this.attendanceStatus = 'Status: Selesai Shift Kerja Hari Ini';
+                    this.showPopup('Clock Out Berhasil', '✅ Timesheet harian berhasil direkap.');
                 },
 
                 openModal(type) {
@@ -655,7 +685,7 @@
                         await window.fb.addDoc(window.fb.collection(window.fb.db, "requests"), {
                             userId: this.currentUserId,
                             name: this.currentUser.name,
-                            type: this.modalType.toUpperCase(),
+                            type: this.modalType,
                             date: this.formInput.date,
                             reason: this.formInput.reason,
                             status: 'Pending',
