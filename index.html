@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TalentaLite Ultimate - Enterprise HRIS & Payroll System</title>
+    <title>TalentaLite Ultimate Enterprise - HRIS & Payroll Platform</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
@@ -13,7 +13,7 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-slate-900 font-sans antialiased text-slate-100" x-data="ultimateApp()">
+<body class="bg-slate-950 font-sans antialiased text-slate-100" x-data="ultimateEnterpriseApp()">
 
     <!-- App Container Wrapper (Navy Theme) -->
     <div class="max-w-md mx-auto min-h-screen bg-slate-900 shadow-2xl flex flex-col justify-between relative overflow-hidden border-x border-slate-800">
@@ -27,14 +27,14 @@
                     </div>
                     <div>
                         <h1 class="text-xl font-extrabold tracking-tight">TalentaLite Ultimate</h1>
-                        <p class="text-xs text-slate-400 mt-1">Navy Corporate HRIS & Payroll Platform</p>
+                        <p class="text-xs text-slate-400 mt-1">Enterprise HRIS, Payroll & e-Bupot System</p>
                     </div>
                 </div>
 
                 <div class="bg-slate-900/90 text-slate-100 p-6 rounded-3xl shadow-2xl space-y-4 border border-slate-800">
                     <div class="space-y-1">
-                        <h2 class="text-sm font-bold text-slate-200">Autentikasi Sistem</h2>
-                        <p class="text-[11px] text-slate-400">Pilih profil kredensial untuk masuk</p>
+                        <h2 class="text-sm font-bold text-slate-200">Autentikasi Perusahaan</h2>
+                        <p class="text-[11px] text-slate-400">Pilih akses profil untuk masuk ke sistem</p>
                     </div>
                     
                     <div class="space-y-3 text-xs">
@@ -91,10 +91,10 @@
                         <!-- VIEW KARYAWAN -->
                         <template x-if="currentUser.type === 'employee'">
                             <div class="space-y-4">
-                                <!-- Status Kehadiran, Geotag & Face Auth -->
+                                <!-- Status Kehadiran, Liveness Validation & Geotag -->
                                 <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-lg text-center relative overflow-hidden">
                                     <div class="absolute top-0 right-0 bg-blue-900/50 text-blue-300 text-[10px] font-bold px-3 py-1 rounded-bl-xl border-l border-b border-blue-800">
-                                        Anti Fake GPS & Lock Device Active 🔒
+                                        Liveness & Anti Fake GPS Active 🔒
                                     </div>
                                     
                                     <p class="text-xs text-slate-400 font-bold tracking-wider uppercase mt-1">Status Kehadiran Hari Ini</p>
@@ -105,7 +105,7 @@
 
                                     <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 mb-4 bg-slate-900 p-3 rounded-xl border border-slate-800">
                                         <div>
-                                            <p class="text-slate-400 font-medium">Clock-In (Face Auth)</p>
+                                            <p class="text-slate-400 font-medium">Clock-In (Liveness)</p>
                                             <p class="font-bold text-white text-sm" x-text="clockInTime || '--:--'"></p>
                                         </div>
                                         <div>
@@ -116,7 +116,7 @@
 
                                     <template x-if="!isClockedIn">
                                         <button @click="clockIn()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs">
-                                            <i class="fa-solid fa-face-recognition"></i> Face Auth & Clock-In Geotag
+                                            <i class="fa-solid fa-camera-rotate"></i> Liveness Validation & Clock-In
                                         </button>
                                     </template>
                                     <template x-if="isClockedIn && !isClockedOut">
@@ -125,46 +125,46 @@
                                         </button>
                                     </template>
                                     <template x-if="isClockedIn && isClockedOut">
-                                        <p class="text-xs text-blue-300 font-semibold bg-blue-950 py-2.5 rounded-lg border border-blue-900">✨ Kehadiran & Jam Kerja Selesai Terekam.</p>
+                                        <p class="text-xs text-blue-300 font-semibold bg-blue-950 py-2.5 rounded-lg border border-blue-900">✨ Kehadiran & Timesheet Selesai Terekam.</p>
                                     </template>
                                 </div>
 
-                                <!-- Modul Layanan Mandiri (Cuti, Sakit, Lembur, Reimburse) -->
+                                <!-- Modul Layanan Mandiri (ESS, Cuti, Lembur, Reimburse, Bantuan) -->
                                 <div>
-                                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Layanan Mandiri Karyawan</h3>
+                                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Employee Self Service (ESS)</h3>
                                     <div class="grid grid-cols-2 gap-2">
                                         <button @click="openModal('cuti')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
                                             <i class="fa-solid fa-calendar-days text-blue-400 mb-1.5 text-sm"></i>
-                                            <p class="font-bold text-xs text-slate-200">Permohonan Cuti</p>
-                                            <p class="text-[10px] text-slate-400">Sisa kuota: 12 Hari</p>
-                                        </button>
-                                        <button @click="openModal('sakit')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
-                                            <i class="fa-solid fa-notes-medical text-rose-400 mb-1.5 text-sm"></i>
-                                            <p class="font-bold text-xs text-slate-200">Izin & Sakit</p>
-                                            <p class="text-[10px] text-slate-400">Lampirkan Surat Dokter</p>
+                                            <p class="font-bold text-xs text-slate-200">Leave Management</p>
+                                            <p class="text-[10px] text-slate-400">Pengajuan Cuti / Izin</p>
                                         </button>
                                         <button @click="openModal('lembur')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
                                             <i class="fa-solid fa-business-time text-amber-400 mb-1.5 text-sm"></i>
-                                            <p class="font-bold text-xs text-slate-200">Jam Lembur</p>
-                                            <p class="text-[10px] text-slate-400">Pengajuan & Approval</p>
+                                            <p class="font-bold text-xs text-slate-200">Overtime Management</p>
+                                            <p class="text-[10px] text-slate-400">Pengajuan Lembur</p>
                                         </button>
                                         <button @click="openModal('reimburse')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
                                             <i class="fa-solid fa-receipt text-emerald-400 mb-1.5 text-sm"></i>
-                                            <p class="font-bold text-xs text-slate-200">Reimburse</p>
-                                            <p class="text-[10px] text-slate-400">Klaim pengeluaran</p>
+                                            <p class="font-bold text-xs text-slate-200">Reimbursement</p>
+                                            <p class="text-[10px] text-slate-400">Klaim biaya & pengeluaran</p>
+                                        </button>
+                                        <button @click="alert('Membuka HR Helpdesk: Tim siap membantu kendala administrasi Anda.')" class="p-3 bg-slate-950 border border-slate-800 hover:border-blue-500 rounded-xl text-left shadow-sm transition group">
+                                            <i class="fa-solid fa-headset text-indigo-400 mb-1.5 text-sm"></i>
+                                            <p class="font-bold text-xs text-slate-200">HR Helpdesk</p>
+                                            <p class="text-[10px] text-slate-400">Bantuan cepat & tiket</p>
                                         </button>
                                     </div>
                                 </div>
 
-                                <!-- Pengumuman Korporat -->
+                                <!-- Pengumuman & Komunikasi Internal -->
                                 <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-2">
                                     <div class="flex items-center justify-between">
-                                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Berita & Pengumuman</h4>
-                                        <span class="text-[10px] bg-blue-950 text-blue-300 px-2 py-0.5 rounded font-bold border border-blue-900">Broadcast HR</span>
+                                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Komunikasi Internal</h4>
+                                        <span class="text-[10px] bg-blue-950 text-blue-300 px-2 py-0.5 rounded font-bold border border-blue-900">Broadcast</span>
                                     </div>
                                     <div class="border-l-2 border-blue-500 pl-3 py-1 space-y-0.5">
-                                        <p class="text-xs font-bold text-slate-200">Pemberlakuan Kalender Libur Nasional Q4</p>
-                                        <p class="text-[11px] text-slate-400">Silakan cek menu kalender untuk jadwal libur operasional cabang.</p>
+                                        <p class="text-xs font-bold text-slate-200">Town Hall Meeting & Pembaruan Kalender Libur</p>
+                                        <p class="text-[11px] text-slate-400">Cek kalender instansi untuk detail hari libur nasional terbaru.</p>
                                     </div>
                                 </div>
                             </div>
@@ -174,8 +174,8 @@
                         <template x-if="currentUser.type === 'admin'">
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">HR & Payroll Control Center</h3>
-                                    <button @click="alert('Mengunduh Laporan Kehadiran & Aktivitas Lengkap (.XLS)...')" class="text-[11px] bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm transition">
+                                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">HRIS & Payroll Management Center</h3>
+                                    <button @click="alert('Mengekspor Laporan Kehadiran, Timesheet, & Payroll Lengkap (.XLS)...')" class="text-[11px] bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm transition">
                                         <i class="fa-solid fa-file-excel mr-1"></i> Export Laporan
                                     </button>
                                 </div>
@@ -196,22 +196,28 @@
                                     </div>
                                 </div>
 
-                                <!-- Kontrol HR: Multi Lokasi, Jabatan, Shift & Kalender -->
+                                <!-- Kontrol Modul Komprehensif Admin -->
                                 <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
-                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Manajemen Instansi & Cabang</h4>
+                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Kelola Fitur Perusahaan & Cabang</h4>
                                     <div class="grid grid-cols-2 gap-2 text-xs">
-                                        <button @click="alert('Mengelola 3 Kantor Cabang aktif (Pusat, Cabang Utara, Cabang Selatan).')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
-                                            🏢 Multi Lokasi (3 Cabang)
+                                        <button @click="alert('Manajemen Kantor Cabang & Multi Lokasi: Mengatur titik radius GPS instansi.')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
+                                            🏢 Multi Lokasi & Cabang
                                         </button>
-                                        <button @click="alert('Mengelola Shift Kerja Fleksibel & Manajemen Jabatan.')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
+                                        <button @click="alert('Kelola Shift, Kalender Libur, & Manajemen Jabatan Organisasi.')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
                                             ⏰ Shift & Jabatan
+                                        </button>
+                                        <button @click="alert('Pembuatan e-Bupot Otomatis terintegrasi dengan Coretax DJP.')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
+                                            📑 Buat e-Bupot DJP
+                                        </button>
+                                        <button @click="alert('Manajemen Aset & Akses Data Karyawan perusahaan.')" class="p-2.5 bg-slate-900 border border-slate-800 hover:border-blue-500 rounded-xl text-left font-medium text-slate-300">
+                                            📦 Manajemen Aset & Akses
                                         </button>
                                     </div>
                                 </div>
 
-                                <!-- Persetujuan Cuti / Lembur / Reimburse Pending -->
+                                <!-- Persetujuan Request Masuk -->
                                 <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
-                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Approval Mobile Apps Masuk</h4>
+                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Persetujuan Mobile Apps Masuk</h4>
                                     <div class="space-y-2">
                                         <template x-for="req in leaveRequests" :key="req.id">
                                             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs flex justify-between items-center">
@@ -241,14 +247,14 @@
 
                     <!-- TAB 2: TIM & AKTIVITAS -->
                     <div x-show="activeTab === 'team'" class="space-y-3" x-cloak>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Laporan Aktivitas & Data Karyawan</h3>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Tracking & Laporan Aktivitas</h3>
                         <div class="space-y-2">
                             <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between shadow-sm text-xs">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-full bg-blue-950 text-blue-400 font-bold flex items-center justify-center border border-blue-900">SR</div>
                                     <div>
                                         <p class="font-bold text-slate-200">Siti Rahma</p>
-                                        <p class="text-slate-400 text-[11px]">Marketing & Broadcast • Cabang Pusat</p>
+                                        <p class="text-slate-400 text-[11px]">Marketing • Live Tracking: Lapangan Pusat</p>
                                     </div>
                                 </div>
                                 <span class="bg-emerald-950 text-emerald-400 border border-emerald-900 px-2.5 py-1 rounded-md font-bold text-[10px]">Aktif</span>
@@ -258,7 +264,7 @@
                                     <div class="w-9 h-9 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center border border-slate-800">BS</div>
                                     <div>
                                         <p class="font-bold text-slate-200">Budi Santoso</p>
-                                        <p class="text-slate-400 text-[11px]">Staff Operasional • Cabang Pusat</p>
+                                        <p class="text-slate-400 text-[11px]">Staff Operasional • Live Tracking: Kantor Pusat</p>
                                     </div>
                                 </div>
                                 <span class="bg-emerald-950 text-emerald-400 border border-emerald-900 px-2.5 py-1 rounded-md font-bold text-[10px]">Aktif</span>
@@ -266,33 +272,33 @@
                         </div>
                     </div>
 
-                    <!-- TAB 3: PAYROLL OTOMATIS -->
+                    <!-- TAB 3: PAYROLL, BPJS, PPH 21 & E-BUPOT -->
                     <div x-show="activeTab === 'payroll'" class="space-y-4" x-cloak>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Payroll, BPJS & PPh 21</h3>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Payroll Calculation, BPJS & e-Bupot</h3>
                         <div class="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-5 rounded-2xl shadow-lg space-y-3 border border-slate-800">
-                            <p class="text-xs text-slate-300 font-medium">Hitung Otomatis Gaji Bersih (Take Home Pay)</p>
+                            <p class="text-xs text-slate-300 font-medium">Hitung Otomatis Take Home Pay</p>
                             <h2 class="text-2xl font-extrabold tracking-tight">Rp 5.450.000</h2>
                             <div class="text-[11px] text-slate-300 pt-2 border-t border-slate-800 space-y-1">
-                                <div class="flex justify-between"><span>Gaji Pokok & Tunjangan:</span> <span class="font-bold">Rp 6.000.000</span></div>
+                                <div class="flex justify-between"><span>Gaji & Kompensasi:</span> <span class="font-bold">Rp 6.000.000</span></div>
                                 <div class="flex justify-between"><span>Potongan BPJS & PPh 21:</span> <span class="text-rose-400 font-bold">- Rp 550.000</span></div>
                             </div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm space-y-3 text-xs">
-                            <h4 class="font-bold text-slate-200">Komponen Slip Gaji Resmi</h4>
+                            <h4 class="font-bold text-slate-200">Distribusi Payslip & e-Bupot DJP</h4>
                             <div class="space-y-2">
                                 <div class="flex justify-between items-center p-3 bg-slate-900 rounded-xl border border-slate-800">
                                     <div>
                                         <p class="font-bold text-slate-200">September 2026</p>
-                                        <p class="text-slate-400 text-[10px]">Otomatis Termasuk Uang Lembur & Potongan Absensi</p>
+                                        <p class="text-slate-400 text-[10px]">Termasuk Perhitungan e-Bupot Coretax DJP</p>
                                     </div>
-                                    <button @click="alert('Mengunduh Slip Gaji PDF Resmi...')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] transition">Unduh PDF</button>
+                                    <button @click="alert('Mengunduh Slip Gaji & e-Bupot PDF Resmi...')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] transition">Unduh PDF</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- TAB 4: AKUN & KALENDER -->
+                    <!-- TAB 4: AKUN, BENEFIT & ONBOARDING -->
                     <div x-show="activeTab === 'account'" class="space-y-4" x-cloak>
                         <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-sm text-center space-y-3">
                             <div class="w-16 h-16 rounded-full bg-blue-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto shadow-md border border-blue-500" x-text="currentUser.initial"></div>
@@ -300,16 +306,16 @@
                                 <h3 class="font-bold text-slate-100 text-base" x-text="currentUser.name"></h3>
                                 <p class="text-xs text-slate-400" x-text="currentUser.role"></p>
                             </div>
-                            <span class="inline-block bg-blue-950 text-blue-300 border border-blue-900 text-[10px] font-bold px-3 py-1 rounded-full">Kelengkapan Data Karyawan Lengkap</span>
+                            <span class="inline-block bg-blue-950 text-blue-300 border border-blue-900 text-[10px] font-bold px-3 py-1 rounded-full">Kelengkapan Data Karyawan & Benefit Aktif</span>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 rounded-2xl shadow-sm overflow-hidden text-xs divide-y divide-slate-800">
-                            <div class="p-3.5 flex justify-between items-center hover:bg-slate-900 cursor-pointer transition" @click="alert('Kalender Hari Libur Nasional & Instansi aktif.')">
-                                <span class="font-semibold text-slate-300"><i class="fa-solid fa-calendar-days text-blue-400 w-5"></i> Kalender Libur Nasional</span>
+                            <div class="p-3.5 flex justify-between items-center hover:bg-slate-900 cursor-pointer transition" @click="alert('Membuka Kalender Libur Nasional & Instansi.')">
+                                <span class="font-semibold text-slate-300"><i class="fa-solid fa-calendar-days text-blue-400 w-5"></i> Kalender & Hari Libur</span>
                                 <i class="fa-solid fa-chevron-right text-slate-600"></i>
                             </div>
-                            <div class="p-3.5 flex justify-between items-center hover:bg-slate-900 cursor-pointer transition" @click="alert('Pengaturan perangkat ter-lock otomatis.')">
-                                <span class="font-semibold text-slate-300"><i class="fa-solid fa-mobile-screen-button text-blue-400 w-5"></i> Keamanan Perangkat (Lock Device)</span>
+                            <div class="p-3.5 flex justify-between items-center hover:bg-slate-900 cursor-pointer transition" @click="alert('Pengelolaan Employee Benefit & Onboarding/Offboarding.')">
+                                <span class="font-semibold text-slate-300"><i class="fa-solid fa-gift text-blue-400 w-5"></i> Employee Benefit & Onboarding</span>
                                 <i class="fa-solid fa-chevron-right text-slate-600"></i>
                             </div>
                         </div>
@@ -351,8 +357,8 @@
                                 <input type="date" x-model="formInput.date" class="w-full border border-slate-700 p-2.5 rounded-xl focus:outline-blue-500 bg-slate-800 font-medium text-slate-200">
                             </div>
                             <div>
-                                <label class="block text-slate-300 mb-1 font-semibold">Keterangan / Nominal (Reimburse)</label>
-                                <textarea x-model="formInput.reason" rows="3" placeholder="Tuliskan keterangan atau nominal klaim..." class="w-full border border-slate-700 p-2.5 rounded-xl focus:outline-blue-500 bg-slate-800 font-medium text-slate-200"></textarea>
+                                <label class="block text-slate-300 mb-1 font-semibold">Keterangan / Nominal Klaim</label>
+                                <textarea x-model="formInput.reason" rows="3" placeholder="Tuliskan alasan atau keterangan lengkap..." class="w-full border border-slate-700 p-2.5 rounded-xl focus:outline-blue-500 bg-slate-800 font-medium text-slate-200"></textarea>
                             </div>
                         </div>
 
@@ -368,16 +374,16 @@
 
     </div>
 
-    <!-- Script Logika Ultimate -->
+    <!-- Script Logika Ultimate Enterprise -->
     <script>
-        function ultimateApp() {
+        function ultimateEnterpriseApp() {
             return {
                 isLoggedIn: false,
                 selectedRole: 'employee',
                 activeTab: 'home',
                 currentUser: { name: '', role: '', initial: '', type: 'employee' },
                 currentDate: 'Minggu, 4 Okt 2026',
-                locationStatus: 'Kantor Pusat • Geotag Valid (Anti Fake GPS)',
+                locationStatus: 'Kantor Pusat • Liveness & Geotag Valid',
                 
                 isClockedIn: false,
                 isClockedOut: false,
@@ -392,7 +398,7 @@
                 adminStats: { hadir: 42, izin: 3, alpha: 0 },
                 leaveRequests: [
                     { id: 1, name: 'Siti Rahma', type: 'Permohonan Cuti', date: '6-8 Okt 2026', reason: 'Urusan keluarga di luar kota', status: 'Pending' },
-                    { id: 2, name: 'Budi Santoso', type: 'Jam Lembur', date: '4 Okt 2026', reason: 'Maintenance Server & Broadcast Shopee', status: 'Pending' }
+                    { id: 2, name: 'Budi Santoso', type: 'Jam Lembur', date: '4 Okt 2026', reason: 'Maintenance Server & Broadcast Campaign', status: 'Pending' }
                 ],
 
                 login() {
@@ -413,8 +419,8 @@
                     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     this.clockInTime = timeNow + ' WIB';
                     this.isClockedIn = true;
-                    this.attendanceStatus = 'Hadir (Face Auth & Geotag OK)';
-                    alert('🔒 Keamanan Aktif: Face Authentication berhasil & Lokasi Geotag tervalidasi (Anti Fake GPS & Lock Device).');
+                    this.attendanceStatus = 'Hadir (Liveness & Geotag OK)';
+                    alert('🔒 Keamanan Aktif: Liveness Validation wajah sukses & Geotag tervalidasi (Anti Fake GPS & Lock Device).');
                 },
 
                 clockOut() {
@@ -422,7 +428,7 @@
                     this.clockOutTime = timeNow + ' WIB';
                     this.isClockedOut = true;
                     this.attendanceStatus = 'Selesai Jam Kerja Harian';
-                    alert('✅ Clock-Out Berhasil: Rekapitulasi jam kerja & potongan absensi tercatat otomatis.');
+                    alert('✅ Clock-Out Berhasil: Rekapitulasi timesheet & potongan absensi tercatat otomatis.');
                 },
 
                 openModal(type) {
