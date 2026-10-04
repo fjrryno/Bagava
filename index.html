@@ -11,7 +11,7 @@
     <!-- Firebase SDK v10 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Konfigurasi Firebase Proyek Bagava
@@ -29,7 +29,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc };
+        window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc };
         window.isFirebaseReady = true;
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -308,7 +308,7 @@
                     </div>
                 </div>
 
-                <!-- ================= TAB 4: PAYROLL (LIVE CALCULATION) ================= -->
+                <!-- ================= TAB 4: PAYROLL ================= -->
                 <div x-show="activeTab === 'payroll'" class="space-y-4" x-cloak>
                     <div class="bg-gradient-to-br from-blue-950 via-slate-900 to-slate-950 text-white p-5 rounded-2xl shadow-lg space-y-3 border border-slate-800">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
@@ -327,7 +327,7 @@
                     </button>
                 </div>
 
-                <!-- ================= TAB 5: AKUN (SESUAI REFERENSI GAMBAR) ================= -->
+                <!-- ================= TAB 5: AKUN (INTERACTIVE MENU) ================= -->
                 <div x-show="activeTab === 'account'" class="space-y-4 text-xs" x-cloak>
                     
                     <!-- KARTU PROFIL UTAMA -->
@@ -349,23 +349,23 @@
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
                         <div class="p-3.5 border-b border-slate-800 font-bold text-slate-200">Info saya</div>
                         <div class="divide-y divide-slate-800/60">
-                            <button @click="showPopup('Info Personal', 'Nama Lengkap: ' + currentUser.name + '\nEmail: ' + currentUser.email + '\nStatus Karyawan: Karyawan Tetap')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('personal')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-user text-blue-400 w-4"></i> Info personal</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
-                            <button @click="showPopup('Info Pekerjaan', 'Jabatan: ' + currentUser.role + '\nDepartemen: Operasional & CRM\nLokasi: Kantor Pusat')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('job')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-briefcase text-blue-400 w-4"></i> Info pekerjaan</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
-                            <button @click="showPopup('Kontak Darurat', 'Nomor Telepon: ' + userProfile.phone + '\nAlamat: ' + userProfile.address)" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('emergency')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-address-book text-blue-400 w-4"></i> Info kontak darurat</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
-                            <button @click="showPopup('Info Keluarga', 'Status Pernikahan: Belum Menikah\nTanggungan Keluarga: Nihil')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('family')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-users text-blue-400 w-4"></i> Info keluarga</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
-                            <button @click="showPopup('Pendidikan', 'Universitas Swasta - S1 Manajemen Bisnis\nPengalaman: 5 Tahun di Bidang Operasional')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('education')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-graduation-cap text-blue-400 w-4"></i> Pendidikan & Pengalaman</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
@@ -373,7 +373,7 @@
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-file-invoice-dollar text-blue-400 w-4"></i> Info payroll & rekening</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
-                            <button @click="showPopup('File Saya', 'KTP, NPWP, dan Paklaring telah terverifikasi di Cloud Storage.')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('files')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-folder-open text-blue-400 w-4"></i> File saya</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
@@ -384,14 +384,14 @@
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
                         <div class="p-3.5 border-b border-slate-800 font-bold text-slate-200">Pengaturan</div>
                         <div class="divide-y divide-slate-800/60">
-                            <button @click="showPopup('Ubah Kata Sandi', 'Silakan masukkan kata sandi lama dan baru melalui sistem keamanan.')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('password')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-lock text-slate-400 w-4"></i> Ubah kata sandi</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
-                            <div class="p-3.5 flex justify-between items-center">
+                            <button @click="openAccountModal('pin')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-shield text-slate-400 w-4"></i> PIN Keamanan</span>
-                                <span class="text-slate-500">Tidak aktif</span>
-                            </div>
+                                <span class="text-blue-400 font-semibold" x-text="userProfile.pinActive ? 'Aktif' : 'Tidak aktif'"></span>
+                            </button>
                         </div>
                     </div>
 
@@ -399,7 +399,7 @@
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden">
                         <div class="p-3.5 border-b border-slate-800 font-bold text-slate-200">Lainnya</div>
                         <div class="divide-y divide-slate-800/60">
-                            <button @click="showPopup('Pusat Bantuan', 'Hubungi tim dukungan IT atau HR melalui helpdesk internal.')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
+                            <button @click="openAccountModal('help')" class="w-full p-3.5 flex justify-between items-center hover:bg-slate-800/50 transition text-left">
                                 <span class="flex items-center gap-2.5 text-slate-300"><i class="fa-solid fa-circle-question text-slate-400 w-4"></i> Pusat bantuan</span>
                                 <i class="fa-solid fa-chevron-right text-slate-500 text-[10px]"></i>
                             </button>
@@ -433,7 +433,121 @@
                 </button>
             </nav>
 
-            <!-- MODAL KAMERA & GEOFENCING (HAFERSINE DISTANCE) -->
+            <!-- MODAL DINAMIS MENU AKUN (INTERACTIVE ACCOUNT FORMS) -->
+            <div x-show="showAccountModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
+                <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-800 text-xs">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-extrabold text-sm text-slate-100" x-text="accountModalTitle"></h3>
+                        <button @click="showAccountModal = false" class="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold hover:bg-slate-700">✕</button>
+                    </div>
+
+                    <!-- 1. PERSONAL -->
+                    <template x-if="accountModalType === 'personal'">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-slate-300 mb-1 font-semibold">Nama Lengkap</label>
+                                <input type="text" x-model="currentUser.name" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 mb-1 font-semibold">Email Perusahaan</label>
+                                <input type="email" disabled x-model="currentUser.email" class="w-full border border-slate-800 p-2.5 rounded-xl bg-slate-900 text-slate-500">
+                            </div>
+                            <button @click="saveProfileData()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition">Simpan Perubahan</button>
+                        </div>
+                    </template>
+
+                    <!-- 2. JOB -->
+                    <template x-if="accountModalType === 'job'">
+                        <div class="space-y-2 text-slate-300">
+                            <p><strong>Jabatan:</strong> <span class="text-white" x-text="currentUser.role"></span></p>
+                            <p><strong>Departemen:</strong> Operasional & Customer Relationship Management</p>
+                            <p><strong>Lokasi Kerja:</strong> Kantor Pusat (Jakarta Selatan)</p>
+                            <p><strong>Status Pegawai:</strong> Karyawan Tetap (Full-Time)</p>
+                        </div>
+                    </template>
+
+                    <!-- 3. EMERGENCY -->
+                    <template x-if="accountModalType === 'emergency'">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-slate-300 mb-1 font-semibold">Nomor Telepon / WhatsApp</label>
+                                <input type="text" x-model="userProfile.phone" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 mb-1 font-semibold">Alamat Domisili</label>
+                                <textarea x-model="userProfile.address" rows="2" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200"></textarea>
+                            </div>
+                            <button @click="saveProfileData()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition">Simpan Kontak</button>
+                        </div>
+                    </template>
+
+                    <!-- 4. FAMILY -->
+                    <template x-if="accountModalType === 'family'">
+                        <div class="space-y-2 text-slate-300">
+                            <p><strong>Status Pernikahan:</strong> Belum Menikah</p>
+                            <p><strong>Tanggungan Pajak (PTKP):</strong> TK/0</p>
+                            <p><strong>Kontak Darurat Keluarga:</strong> Ibu Kandung (081298765432)</p>
+                        </div>
+                    </template>
+
+                    <!-- 5. EDUCATION -->
+                    <template x-if="accountModalType === 'education'">
+                        <div class="space-y-2 text-slate-300">
+                            <p><strong>Pendidikan Terakhir:</strong> S1 Manajemen Bisnis</p>
+                            <p><strong>Pengalaman Profesional:</strong> 5 Tahun Spesialis Visual Design & CRM Support</p>
+                        </div>
+                    </template>
+
+                    <!-- 6. FILES -->
+                    <template x-if="accountModalType === 'files'">
+                        <div class="space-y-2 text-slate-300">
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <span>KTP_Deden_Fajar.pdf</span>
+                                <span class="text-emerald-400 font-semibold">Terverifikasi</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <span>NPWP_Perusahaan.pdf</span>
+                                <span class="text-emerald-400 font-semibold">Terverifikasi</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <span>Kontrak_Kerja_2026.pdf</span>
+                                <span class="text-emerald-400 font-semibold">Terverifikasi</span>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- 7. PASSWORD -->
+                    <template x-if="accountModalType === 'password'">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-slate-300 mb-1 font-semibold">Kata Sandi Baru</label>
+                                <input type="password" x-model="newPasswordInput" placeholder="Min. 6 karakter" class="w-full border border-slate-700 p-2.5 rounded-xl bg-slate-950 text-slate-200">
+                            </div>
+                            <button @click="updateUserPassword()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition">Perbarui Kata Sandi</button>
+                        </div>
+                    </template>
+
+                    <!-- 8. PIN -->
+                    <template x-if="accountModalType === 'pin'">
+                        <div class="space-y-3 text-center">
+                            <p class="text-slate-300" x-text="userProfile.pinActive ? 'PIN Keamanan Anda saat ini aktif.' : 'Aktifkan PIN untuk pengamanan transaksi & presensi.'"></p>
+                            <button @click="togglePinSecurity()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition" x-text="userProfile.pinActive ? 'Nonaktifkan PIN' : 'Aktifkan PIN 6-Digit'"></button>
+                        </div>
+                    </template>
+
+                    <!-- 9. HELP -->
+                    <template x-if="accountModalType === 'help'">
+                        <div class="space-y-2 text-slate-300">
+                            <p class="font-bold text-white">Pusat Bantuan TalentaLite:</p>
+                            <p>Untuk kendala teknis aplikasi, absensi, atau penggajian, silakan hubungi tim Helpdesk HR di email <code class="text-blue-400">hr@bagava.com</code> atau hubungi ekstensi internal 101.</p>
+                        </div>
+                    </template>
+
+                    <button @click="showAccountModal = false" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl transition mt-2">Tutup</button>
+                </div>
+            </div>
+
+            <!-- MODAL KAMERA & GEOFENCING -->
             <div x-show="showCameraModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-5 z-50 animate-in fade-in" x-cloak>
                 <div class="flex justify-between items-center text-white">
                     <div>
@@ -591,7 +705,7 @@
 
     </div>
 
-    <!-- Script Logika Ultimate Enterprise dengan Haversine Geofencing & Live Payroll -->
+    <!-- Script Logika Ultimate Enterprise -->
     <script>
         function ultimateEnterpriseApp() {
             return {
@@ -615,6 +729,11 @@
                 showAjukanModal: false,
                 showAllAppsModal: false,
                 showCameraModal: false,
+                showAccountModal: false,
+                accountModalTitle: '',
+                accountModalType: '',
+                newPasswordInput: '',
+
                 cameraMode: 'in',
                 mediaStream: null,
                 liveCameraTime: '',
@@ -622,7 +741,6 @@
                 isWithinGeofence: true,
                 geofenceStatusText: 'Validasi Radius: Dalam Jangkauan Kantor (0m)',
 
-                // Koordinat Kantor Pusat (Contoh: Jakarta Selatan)
                 officeLat: -6.2293,
                 officeLng: 106.8167,
                 maxRadiusMeters: 200,
@@ -636,7 +754,8 @@
 
                 userProfile: {
                     phone: '081234567890',
-                    address: 'Jl. Jenderal Sudirman, Jakarta Selatan'
+                    address: 'Jl. Jenderal Sudirman, Jakarta Selatan',
+                    pinActive: false
                 },
 
                 leaveRequests: [],
@@ -652,7 +771,6 @@
                 },
 
                 get attendanceBonus() {
-                    // Kalkulasi bonus kehadiran dinamis berdasarkan jumlah hari hadir di Firestore
                     return this.attendanceHistory.length * 50000;
                 },
 
@@ -688,6 +806,22 @@
                     this.showPopupModal = true;
                 },
 
+                openAccountModal(type) {
+                    this.accountModalType = type;
+                    switch(type) {
+                        case 'personal': this.accountModalTitle = 'Informasi Personal'; break;
+                        case 'job': this.accountModalTitle = 'Informasi Pekerjaan'; break;
+                        case 'emergency': this.accountModalTitle = 'Kontak Darurat & Alamat'; break;
+                        case 'family': this.accountModalTitle = 'Informasi Keluarga & Tanggungan'; break;
+                        case 'education': this.accountModalTitle = 'Pendidikan & Pengalaman'; break;
+                        case 'files': this.accountModalTitle = 'Dokumen & File Saya'; break;
+                        case 'password': this.accountModalTitle = 'Ubah Kata Sandi Akun'; break;
+                        case 'pin': this.accountModalTitle = 'Pengaturan PIN Keamanan'; break;
+                        case 'help': this.accountModalTitle = 'Pusat Bantuan TalentaLite'; break;
+                    }
+                    this.showAccountModal = true;
+                },
+
                 async fetchUserData(uid, email) {
                     try {
                         const userDocRef = window.fb.doc(window.fb.db, "users", uid);
@@ -715,6 +849,7 @@
 
                         if(userData.phone) this.userProfile.phone = userData.phone;
                         if(userData.address) this.userProfile.address = userData.address;
+                        if(userData.pinActive !== undefined) this.userProfile.pinActive = userData.pinActive;
 
                         this.isLoggedIn = true;
                         this.activeTab = 'home';
@@ -751,7 +886,8 @@
                                 role: isAdmin ? 'HR Administrator' : 'Admin E-Commerce CS',
                                 type: isAdmin ? 'admin' : 'employee',
                                 phone: '081234567890',
-                                address: 'Jakarta'
+                                address: 'Jakarta',
+                                pinActive: false
                             });
 
                             this.showPopup('Registrasi Berhasil', 'Akun berhasil didaftarkan. Masuk otomatis.');
@@ -769,7 +905,8 @@
                                         role: isAdmin ? 'HR Administrator' : 'Admin E-Commerce CS',
                                         type: isAdmin ? 'admin' : 'employee',
                                         phone: '081234567890',
-                                        address: 'Jakarta'
+                                        address: 'Jakarta',
+                                        pinActive: false
                                     });
                                     this.showPopup('Akun Dibuat Otomatis', 'Akun baru terdeteksi dan berhasil masuk.');
                                 } else {
@@ -799,9 +936,48 @@
                     this.loginPassword = '';
                 },
 
-                // RUMUS Haversine UNTUK GEOFENCING JARAK GPS
+                async saveProfileData() {
+                    try {
+                        const userDocRef = window.fb.doc(window.fb.db, "users", this.currentUserId);
+                        await window.fb.updateDoc(userDocRef, {
+                            name: this.currentUser.name,
+                            phone: this.userProfile.phone,
+                            address: this.userProfile.address
+                        });
+                        this.showAccountModal = false;
+                        this.showPopup('Pembaruan Berhasil', 'Data profil Anda berhasil diperbarui di Cloud Firestore.');
+                    } catch (error) {
+                        this.showPopup('Gagal Menyimpan', error.message);
+                    }
+                },
+
+                async updateUserPassword() {
+                    if (!this.newPasswordInput || this.newPasswordInput.length < 6) {
+                        this.showPopup('Peringatan', 'Kata sandi baru minimal harus 6 karakter.');
+                        return;
+                    }
+                    try {
+                        const user = window.fb.auth.currentUser;
+                        await window.fb.updatePassword(user, this.newPasswordInput);
+                        this.newPasswordInput = '';
+                        this.showAccountModal = false;
+                        this.showPopup('Berhasil', 'Kata sandi akun Anda berhasil diperbarui.');
+                    } catch (error) {
+                        this.showPopup('Gagal', 'Terjadi kesalahan. Silakan keluar sesi dan masuk kembali sebelum mengganti kata sandi.');
+                    }
+                },
+
+                async togglePinSecurity() {
+                    this.userProfile.pinActive = !this.userProfile.pinActive;
+                    try {
+                        const userDocRef = window.fb.doc(window.fb.db, "users", this.currentUserId);
+                        await window.fb.updateDoc(userDocRef, { pinActive: this.userProfile.pinActive });
+                        this.showPopup('Pengaturan PIN', this.userProfile.pinActive ? 'PIN Keamanan berhasil diaktifkan.' : 'PIN Keamanan dinonaktifkan.');
+                    } catch(e) {}
+                },
+
                 calculateHaversineDistance(lat1, lon1, lat2, lon2) {
-                    const R = 6371e3; // Radius bumi dalam meter
+                    const R = 6371e3;
                     const φ1 = lat1 * Math.PI / 180;
                     const φ2 = lat2 * Math.PI / 180;
                     const Δφ = (lat2 - lat1) * Math.PI / 180;
@@ -812,7 +988,7 @@
                               Math.sin(Δλ/2) * Math.sin(Δλ/2);
                     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
-                    return R * c; // Jarak dalam meter
+                    return R * c;
                 },
 
                 async openCamera(mode) {
@@ -820,7 +996,6 @@
                     this.showCameraModal = true;
                     this.liveCameraTime = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
                     
-                    // Cek Geofencing GPS Realtime
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(
                             (position) => {
@@ -839,7 +1014,6 @@
                                 }
                             },
                             () => {
-                                // Fallback jika GPS diblokir browser (simulasi di dalam radius kantor)
                                 this.isWithinGeofence = true;
                                 this.liveCameraLocation = "Kantor Pusat (GPS Simulated)";
                                 this.geofenceStatusText = "Radius Valid: Dalam Jangkauan Kantor";
