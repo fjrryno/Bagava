@@ -127,16 +127,18 @@
                 <!-- ================= TAB 1: BERANDA ================= -->
                 <div x-show="activeTab === 'home'" class="space-y-4" x-cloak>
                     
-                    <!-- BANNER INSTRUKSI TAMBAHKAN KE LAYAR UTAMA (PWA) -->
-                    <div class="bg-gradient-to-r from-blue-900 via-slate-900 to-indigo-950 text-white p-3.5 rounded-2xl shadow-md border border-blue-800/70 flex items-center justify-between">
-                        <div class="space-y-0.5 w-3/4">
-                            <h4 class="text-xs font-extrabold text-blue-300"><i class="fa-solid fa-mobile-screen-button mr-1"></i> Akses Cepat Layar Utama</h4>
-                            <p class="text-[10px] text-slate-300">Pasang aplikasi ini di Home Screen HP Android/iOS Anda melalui menu browser.</p>
+                    <!-- BANNER INSTRUKSI TAMBAHKAN KE LAYAR UTAMA (HANYA MUNCUL JIKA BUKAN STANDALONE / BELUM DI-INSTALL) -->
+                    <template x-if="!isInStandaloneMode">
+                        <div class="bg-gradient-to-r from-blue-900 via-slate-900 to-indigo-950 text-white p-3.5 rounded-2xl shadow-md border border-blue-800/70 flex items-center justify-between">
+                            <div class="space-y-0.5 w-3/4">
+                                <h4 class="text-xs font-extrabold text-blue-300"><i class="fa-solid fa-mobile-screen-button mr-1"></i> Akses Cepat Layar Utama</h4>
+                                <p class="text-[10px] text-slate-300">Pasang aplikasi ini di Home Screen HP Android/iOS Anda.</p>
+                            </div>
+                            <button @click="showInstallGuideModal = true" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold px-3 py-2 rounded-xl shadow transition shrink-0">
+                                Cara Install
+                            </button>
                         </div>
-                        <button @click="showPopup('Panduan PWA', 'Android: Ketuk menu titik tiga (⋮) di browser lalu pilih \"Tambahkan ke Layar Utama\" / \"Install App\".\n\n-iOS Safari: Ketuk tombol Bagikan (Share) di bagian bawah lalu pilih \"Tambah ke Layar Utama\".')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold px-3 py-2 rounded-xl shadow transition shrink-0">
-                            Cara Install
-                        </button>
-                    </div>
+                    </template>
 
                     <!-- PANEL HR ADMIN -->
                     <template x-if="currentUser.type === 'admin'">
@@ -456,6 +458,40 @@
                 </button>
             </nav>
 
+            <!-- MODAL PANDUAN CARA INSTALL (PWA GUIDE) -->
+            <div x-show="showInstallGuideModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in" x-cloak>
+                <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-800 text-xs">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-extrabold text-sm text-blue-400 flex items-center gap-2">
+                            <i class="fa-solid fa-mobile-screen-button"></i> Cara Pasang ke Layar Utama
+                        </h3>
+                        <button @click="showInstallGuideModal = false" class="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold hover:bg-slate-700">✕</button>
+                    </div>
+
+                    <div class="space-y-3 text-slate-300">
+                        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5">
+                            <p class="font-bold text-white flex items-center gap-1.5"><i class="fa-brands fa-android text-emerald-400"></i> Pengguna Android (Chrome)</p>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-400 text-[11px]">
+                                ketuk ikon titik tiga <b class="text-white">( ⋮ )</b> di sudut kanan atas browser.
+                                Pilih opsi <b class="text-white">"Tambahkan ke Layar Utama"</b> atau <b class="text-white">"Install Aplikasi"</b>.
+                                Ketuk <b class="text-white">Install</b> untuk mengonfirmasi. Aplikasi siap diakses dari Home Screen.
+                            </ol>
+                        </div>
+
+                        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5">
+                            <p class="font-bold text-white flex items-center gap-1.5"><i class="fa-brands fa-apple text-sky-400"></i> Pengguna iOS / iPhone (Safari)</p>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-400 text-[11px]">
+                                Ketuk tombol Bagikan <b class="text-white">( <i class="fa-solid fa-arrow-up-from-bracket"></i> )</b> di bagian bawah browser Safari.
+                                Gulir ke bawah lalu pilih <b class="text-white">"Tambah ke Layar Utama"</b> (<span class="italic">Add to Home Screen</span>).
+                                Ketuk <b class="text-white">Tambah</b> di pojok kanan atas.
+                            </ol>
+                        </div>
+                    </div>
+
+                    <button @click="showInstallGuideModal = false" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition">Mengerti & Tutup</button>
+                </div>
+            </div>
+
             <!-- MODAL KUSTOMISASI JABATAN OLEH HR -->
             <div x-show="showCustomRoleModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50" x-cloak>
                 <div class="bg-slate-900 text-slate-100 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-800 text-xs">
@@ -751,6 +787,9 @@
                 currentUserId: '',
                 currentUser: { name: 'Deden Fajar Riyanto', role: 'Admin E-Commerce CS', initial: 'DF', email: '', type: 'employee' },
                 
+                isInStandaloneMode: false,
+                showInstallGuideModal: false,
+
                 isClockedIn: false,
                 isClockedOut: false,
                 clockInTime: '',
@@ -823,6 +862,11 @@
                 },
 
                 initAuthListener() {
+                    // Deteksi apakah aplikasi dijalankan dari Home Screen (Standalone Mode PWA)
+                    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                        this.isInStandaloneMode = true;
+                    }
+
                     const checkInterval = setInterval(() => {
                         if (window.isFirebaseReady && window.fb && window.fb.auth) {
                             clearInterval(checkInterval);
@@ -1074,7 +1118,6 @@
                                 const userLng = position.coords.longitude;
                                 const accuracy = position.coords.accuracy;
 
-                                // Deteksi Anti-Spoofing & Mock Location (Akurasi 0 atau koordinat bulat sempurna tanpa variasi desimal wajar)
                                 if (accuracy === 0 || (userLat % 1 === 0 && userLng % 1 === 0)) {
                                     this.isMockLocationDetected = true;
                                     this.geofenceStatusText = "Peringatan: Terdeteksi Fake GPS / Mock Location!";
