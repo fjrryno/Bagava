@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Firebase SDK v10 -->
+    <!-- Firebase SDK v10 (Global Scope Injector) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -29,8 +29,10 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Pasang ke window secara aman
         window.fb = { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc };
-        console.log("🔥 Firebase Proyek Bagava Berhasil Dimuat");
+        window.isFirebaseReady = true;
+        console.log("🔥 Firebase Proyek Bagava Berhasil Dimuat Sepenuhnya");
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -80,11 +82,11 @@
                 </div>
 
                 <button @click="handleAuth()" :disabled="isLoading" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition text-xs tracking-wide flex items-center justify-center gap-2">
-                    <span x-text="isLoading ? 'Memproses...' : (isRegisterMode ? 'DAFTAR AKUN BARU 📝' : 'MASUK KE SISTEM 🚀')"></span>
+                    <span x-text="isLoading ? 'Memproses ke Server...' : (isRegisterMode ? 'DAFTAR AKUN BARU 📝' : 'MASUK KE SISTEM 🚀')"></span>
                 </button>
                 
                 <div class="text-[10px] text-slate-400 text-center pt-1">
-                    <p>💡 Gunakan email mengandung <code class="text-blue-400">hr</code> / <code class="text-blue-400">admin</code> untuk akses HR.</p>
+                    <p>💡 Email mengandung <code class="text-blue-400">hr</code> / <code class="text-blue-400">admin</code> otomatis jadi HR.</p>
                 </div>
             </div>
         </div>
@@ -350,7 +352,7 @@
 
     </div>
 
-    <!-- Script Logika Kuat & Tanggap Error -->
+    <!-- Script Logika Aman Anti Race-Condition -->
     <script>
         function ultimateEnterpriseApp() {
             return {
@@ -389,14 +391,20 @@
                 leaveRequests: [],
 
                 initAuthListener() {
-                    window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
-                        if (user) {
-                            this.currentUserId = user.uid;
-                            await this.fetchUserData(user.uid, user.email);
-                        } else {
-                            this.isLoggedIn = false;
+                    // Cek berkala sampai modul window.fb siap sepenuhnya
+                    const checkInterval = setInterval(() => {
+                        if (window.isFirebaseReady && window.fb && window.fb.auth) {
+                            clearInterval(checkInterval);
+                            window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
+                                if (user) {
+                                    this.currentUserId = user.uid;
+                                    await this.fetchUserData(user.uid, user.email);
+                                } else {
+                                    this.isLoggedIn = false;
+                                }
+                            });
                         }
-                    });
+                    }, 100);
                 },
 
                 showPopup(title, msg) {
@@ -410,18 +418,22 @@
                         const userDocRef = window.fb.doc(window.fb.db, "users", uid);
                         const userDoc = await window.fb.getDoc(userDocRef);
                         
-                        let userData = { name: 'Karyawan Bagava', role: 'Staff Operasional', type: 'employee' };
+                        let userData = { name: 'Pengguna Bagava', role: 'Staff Operasional', type: 'employee' };
                         if (userDoc.exists()) {
                             userData = userDoc.data();
                         } else {
                             const isAdmin = email.toLowerCase().includes('hr') || email.toLowerCase().includes('admin');
-                            userData = { name: isAdmin ? 'Sarah Manager' : 'Karyawan Bagava', role: isAdmin ? 'HR Administrator' : 'Staff Operasional', type: isAdmin ? 'admin' : 'employee' };
+                            userData = { 
+                                name: isAdmin ? 'Sarah Manager' : 'Deden Fajar', 
+                                role: isAdmin ? 'HR Administrator' : 'Staff Operasional', 
+                                type: isAdmin ? 'admin' : 'employee' 
+                            };
                         }
 
                         this.currentUser = {
                             name: userData.name,
                             role: userData.role,
-                            initial: userData.name ? userData.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : 'BG',
+                            initial: userData.name ? userData.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : 'DF',
                             email: email,
                             type: userData.type || 'employee'
                         };
@@ -441,6 +453,11 @@
                 },
 
                 async handleAuth() {
+                    if(!window.fb || !window.fb.auth) {
+                        this.showPopup('Memuat Sistem', 'Sistem Firebase sedang inisialisasi. Mohon coba klik sekali lagi.');
+                        return;
+                    }
+
                     if(!this.loginEmail || !this.loginPassword) {
                         this.showPopup('Peringatan', 'Mohon isi email dan kata sandi.');
                         return;
@@ -450,16 +467,12 @@
 
                     try {
                         if (this.isRegisterMode) {
-                            if(!this.regName) {
-                                this.showPopup('Peringatan', 'Mohon isi nama lengkap.');
-                                this.isLoading = false;
-                                return;
-                            }
+                            const nameToUse = this.regName || 'Pengguna Baru';
                             const isAdmin = this.loginEmail.toLowerCase().includes('hr') || this.loginEmail.toLowerCase().includes('admin');
                             const userCred = await window.fb.createUserWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
                             
                             await window.fb.setDoc(window.fb.doc(window.fb.db, "users", userCred.user.uid), {
-                                name: this.regName,
+                                name: nameToUse,
                                 email: this.loginEmail,
                                 role: isAdmin ? 'HR Administrator' : 'Staff Operasional',
                                 type: isAdmin ? 'admin' : 'employee',
@@ -467,17 +480,36 @@
                                 address: ''
                             });
 
-                            this.showPopup('Registrasi Berhasil', 'Akun berhasil didaftarkan! Silakan masuk.');
-                            this.isRegisterMode = false;
+                            this.showPopup('Registrasi Berhasil', 'Akun berhasil didaftarkan! Masuk otomatis...');
                         } else {
-                            await window.fb.signInWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
+                            try {
+                                await window.fb.signInWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
+                            } catch (signInErr) {
+                                // Fitur Auto-Register Fallback Pintar
+                                if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
+                                    const isAdmin = this.loginEmail.toLowerCase().includes('hr') || this.loginEmail.toLowerCase().includes('admin');
+                                    const userCred = await window.fb.createUserWithEmailAndPassword(window.fb.auth, this.loginEmail, this.loginPassword);
+                                    
+                                    await window.fb.setDoc(window.fb.doc(window.fb.db, "users", userCred.user.uid), {
+                                        name: isAdmin ? 'Sarah Manager' : 'Deden Fajar',
+                                        email: this.loginEmail,
+                                        role: isAdmin ? 'HR Administrator' : 'Staff Operasional',
+                                        type: isAdmin ? 'admin' : 'employee',
+                                        phone: '',
+                                        address: ''
+                                    });
+                                    this.showPopup('Akun Dibuat Otomatis', 'Akun baru terdeteksi dan berhasil masuk ke sistem!');
+                                } else {
+                                    throw signInErr;
+                                }
+                            }
                         }
                     } catch (error) {
                         let msg = error.message;
-                        if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-email') {
-                            msg = 'Email atau kata sandi salah. Pastikan akun sudah terdaftar.';
-                        } else if(error.code === 'auth/email-already-in-use') {
-                            msg = 'Email sudah terdaftar. Silakan pilih tab "Masuk".';
+                        if(error.code === 'auth/email-already-in-use') {
+                            msg = 'Email sudah terdaftar. Silakan masukkan kata sandi yang benar atau gunakan tab "Masuk".';
+                        } else if(error.code === 'auth/weak-password') {
+                            msg = 'Kata sandi terlalu lemah (minimal 6 karakter).';
                         }
                         this.showPopup('Gagal Otentikasi', msg);
                     } finally {
